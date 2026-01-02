@@ -1,0 +1,132 @@
+\documentclass{beamer}
+
+% Konfiguracja języka polskiego
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{polski}
+
+% Wybór motywu prezentacji
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Dane strony tytułowej
+\title{System analizy telemetrii i strategii wyścigowej Formuły 1}
+\author{Paweł Janduła, Mikołaj Mroczek, Szymon Dybał}
+\date{\today}
+
+\begin{document}
+
+% Slajd tytułowy
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Slajd: Tech Stack
+\begin{frame}{Stack technologiczny}
+    \begin{itemize}
+        \item \textbf{Język:} Python 3.10+
+        \item \textbf{Dane:} OpenF1 API (darmowe, publiczne dane)
+        \item \textbf{Biblioteki:}
+            \begin{itemize}
+                \item \texttt{requests} (obsługa API)
+                \item \texttt{matplotlib} (generowanie wykresów)
+                \item \texttt{numpy} / \texttt{pandas} (obliczenia matematyczne)
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Slajd: Cel i Funkcjonalność
+\begin{frame}{Cel i funkcjonalność projektu}
+    \begin{itemize}
+        \item \textbf{Cel:} Stworzenie narzędzia konsolowego do profesjonalnej analizy danych F1
+        \item \textbf{Tryby pracy:}
+            \begin{itemize}
+                \item \textbf{Kwalifikacje:} Analiza „Ultimate Lap”, telemetria (punkty hamowania, otwarcie przepustnicy)
+                \item \textbf{Wyścig:} Strategie oponiarskie, degradacja, regularność (Consistency Score)
+            \end{itemize}
+        \item \textbf{Interfejs:} Rankingi całej stawki oraz pojedynki Head-to-Head (np. Verstappen vs Hamilton)
+    \end{itemize}
+\end{frame}
+
+% Slajd: Architektura Systemu
+\begin{frame}{Architektura systemu}
+    \begin{itemize}
+        \item \textbf{Założenie:} Kod elastyczny i łatwo rozszerzalny (Open/Closed Principle)
+        \item \textbf{Podział na warstwy:}
+            \begin{itemize}
+                \item \textbf{Warstwa kreacyjna:} Zarządzanie typami sesji
+                \item \textbf{Warstwa procesowa:} Standaryzacja generowania raportów
+                \item \textbf{Warstwa logiki:} Wymienne algorytmy analityczne
+                \item \textbf{Warstwa danych:} Izolacja zewnętrznych API
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Slajd: Analityka w praktyce
+\begin{frame}{Analityka w praktyce}
+    W ramach systemu realizowane są następujące analizy:
+    \begin{enumerate}
+        \item \textbf{Ultimate Lap:} Wyznaczanie teoretycznego najlepszego okrążenia
+        \item \textbf{Consistency Score:} Wskaźnik regularności kierowcy
+        \item \textbf{Tyre Degradation:} Analiza trendu zużycia opon
+        \item \textbf{Wizualizacja strategii:} Wykresy generowane przy użyciu Matplotlib
+    \end{enumerate}
+\end{frame}
+
+% Slajd: Wzorzec 1 - Abstract Factory
+\begin{frame}{Wzorzec 1: Abstract Factory (Fabryka Abstrakcyjna)}
+    \begin{itemize}
+        \item \textbf{Elementy:} \texttt{ReportFactory}, \texttt{QualifyingFactory}, \texttt{RaceFactory}
+        \item \textbf{Kontekst F1:} Weekend wyścigowy obejmuje różne typy sesji (Treningi, Kwalifikacje, Wyścig)
+        \item \textbf{Zastosowanie:} Pozwala tworzyć raporty bez wiedzy o typie przetwarzanych danych sesji. \texttt{QualifyingFactory} konfiguruje system pod kątem telemetrii, a \texttt{RaceFactory} pod kątem degradacji opon
+    \end{itemize}
+\end{frame}
+
+% Slajd: Wzorzec 2 - Template Method
+\begin{frame}{Wzorzec 2: Template Method (Metoda Szablonowa)}
+    \begin{itemize}
+        \item \textbf{Elementy:} \texttt{RaceReportTemplate}
+        \item \textbf{Kontekst F1:} Proces generowania raportu jest stały: Pobierz dane $\rightarrow$ Przelicz $\rightarrow$ Wyświetl
+        \item \textbf{Uzasadnienie:} Klasa bazowa definiuje szkielet (\texttt{generate\_report()}), a klasy pochodne (np. \texttt{VisualChartReport}) nadpisują tylko sposób prezentacji danych
+    \end{itemize}
+\end{frame}
+
+% Slajd: Wzorzec 3 - Strategy
+\begin{frame}{Wzorzec 3: Strategy (Strategia)}
+    \begin{itemize}
+        \item \textbf{Elementy:} \texttt{AnalysisStrategy}, \texttt{TyreDegradationStrategy}
+        \item \textbf{Kontekst F1:} Analityka opiera się na zmiennych algorytmach obliczania formy kierowcy
+        \item \textbf{Uzasadnienie:} Pozwala na wymianę algorytmu analizy w locie (np. zmiana ze zużycia opon na analizę zużycia paliwa) bez modyfikacji struktury raportów (Zasada Open/Closed)
+    \end{itemize}
+\end{frame}
+
+% Slajd: Wzorzec 4 - Composite
+\begin{frame}{Wzorzec 4: Composite (Kompozyt)}
+    \begin{itemize}
+        \item \textbf{Elementy:} \texttt{TelemetryComposite} (Throttle, Brake, Gear)
+        \item \textbf{Kontekst F1:} Telemetria składa się z wielu wymiarów analizowanych oddzielnie lub łącznie
+        \item \textbf{Uzasadnienie:} Pozwala traktować pojedynczy algorytm (np. \texttt{BrakeAnalysis}) oraz grupę algorytmów (\texttt{TelemetryComposite}) jednakowo przez wspólną metodę \texttt{.calculate()}
+    \end{itemize}
+\end{frame}
+
+% Slajd: Wzorzec 5 - Facade
+\begin{frame}{Wzorzec 5: Facade (Fasada)}
+    \begin{itemize}
+        \item \textbf{Elementy:} \texttt{F1DataFacade}
+        \item \textbf{Kontekst F1:} Biblioteki danych F1 (np. FastF1) wymagają złożonej synchronizacji wielu źródeł
+        \item \textbf{Uzasadnienie:} Fasada ukrywa złożoność API zewnętrznych. Reszta systemu korzysta z prostej metody \texttt{get\_session\_data()}, co ułatwia podmianę źródła danych w przyszłości
+    \end{itemize}
+\end{frame}
+
+% Slajd: Integracja wzorców
+\begin{frame}{Integracja wzorców w systemie}
+    Współpraca komponentów w pełnym cyklu analizy:
+    \begin{enumerate}
+        \item \textbf{Facade} -- pobieranie i synchronizacja surowych danych
+        \item \textbf{Factory} -- tworzenie instancji odpowiedniego raportu dla sesji
+        \item \textbf{Template Method} -- sterowanie etapami generowania raportu
+        \item \textbf{Strategy / Composite} -- wykonanie specjalistycznych obliczeń
+    \end{enumerate}
+\end{frame}
+
+\end{document}
