@@ -1,5 +1,5 @@
-from AnalysisStrategyInterface import AnalysisStrategy
-from strategies import *
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+from logic.Strategies import *
 
 class TelemetryComposite(AnalysisStrategy):
     def __init__(self):

@@ -1,30 +1,63 @@
+from enum import Enum
+from creation.RaceFactory import RaceReportFactory
+from creation.QualifyingFactory import QualifyingReportFactory
+
+from presentation.CliRenderer import CliRenderer
+from presentation.PdfRenderer import PdfRenderer
+from presentation.PlotRenderer import PlotRenderer
+
 import typer
 
 app = typer.Typer()
 
-@app.command()
-def stworz_plik(nazwa: str, rozszerzenie: str = "txt", force: bool = False):
-    """
-    Tworzy plik o podanej nazwie.
-    """
-    pelna_nazwa = f"{nazwa}.{rozszerzenie}"
-    if force:
-        print(f"Wymuszam nadpisanie pliku: {pelna_nazwa}")
+
+class ReportFormat(str, Enum):
+    CLI = "cli"
+    PDF = "pdf"
+    PLOT = "plot"
+
+def get_renderer(fmt: ReportFormat):
+    if fmt == ReportFormat.CLI:
+        return CliRenderer()
+    elif fmt == ReportFormat.PDF:
+        return PdfRenderer()
+    elif fmt == ReportFormat.PLOT:
+        return PlotRenderer()
     else:
-        print(f"Tworzę bezpiecznie plik: {pelna_nazwa}")
+        return CliRenderer()
+
 
 @app.command()
-def policz(a: int, b: int, operacja: str = "dodaj"):
+def race_report_comparison(
+    driver1: str, 
+    driver2: str, 
+    format: ReportFormat = typer.Option(ReportFormat.CLI, help="Format raportu: cli, pdf lub plot")
+):
     """
-    Wykonuje proste obliczenia matematyczne.
+    Generuje raport porównawczy między dwoma kierowcami.
     """
-    if operacja == "dodaj":
-        print(f"Wynik: {a + b}")
-    elif operacja == "mnoz":
-        print(f"Wynik: {a * b}")
-    else:
-        print(f"Nieznana operacja: {operacja}")
+    factory = RaceReportFactory()
+    
+    renderer = get_renderer(format)
+    
+    print(f"Generowanie raportu dla {driver1} vs {driver2} w formacie {format.value}...")
 
-# 4. Uruchamiamy aplikację (zamiast typer.run)
+    report = factory.create_comparison_report(driver1, driver2, renderer)
+    
+    report.generate_report()
+
+@app.command()
+def race_report_global(
+    format: ReportFormat = typer.Option(ReportFormat.CLI, help="Wybierz format")
+):
+    """
+    Generuje raport typu Race (Global Ranking).
+    """
+    factory = RaceReportFactory()
+    renderer = get_renderer(format)
+    
+    report = factory.create_ranking_report(renderer)
+    report.generate_report()
+
 if __name__ == "__main__":
     app()
