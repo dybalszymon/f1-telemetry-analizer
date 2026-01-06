@@ -1,20 +1,12 @@
 from abc import ABC, abstractmethod
 
-class RankingReport(ABC):
-    @abstractmethod
-    def generate():
-        pass
-
-class ComparisonReport(ABC):
-    @abstractmethod
-    def generate():
-        pass
+from process.RaceReportTemplate import RaceReportTemplate
 
 class ReportFactory(ABC):
     @abstractmethod
-    def create_ranking_report(self) -> RankingReport:
+    def create_ranking_report(self) -> RaceReportTemplate:
         pass
 
     @abstractmethod
-    def create_comparison_report(self) -> ComparisonReport:
+    def create_comparison_report(self) -> RaceReportTemplate:
         pass
