@@ -16,25 +16,25 @@ class TelemetryComposite(AnalysisStrategy):
         #     child.calculate(data)
         pass
 
-
+# Factory do tworzenia gotowych paczek analiz
 class StrategyFactory:
     @staticmethod
     def create_base_telemetry():
         composite = TelemetryComposite()
-        composite.add(BrakeAnalysis())
-        composite.add(ConsistencyScoreStrategy())
-        composite.add(UltimateLapStrategy())
+        # composite.add(BrakeAnalysis())
+        # composite.add(ConsistencyScoreStrategy())
+        # composite.add(UltimateLapStrategy())
 
         return composite
 
     @staticmethod
     def create_advanced_telemetry():
         composite = TelemetryComposite()
-        composite.add(BrakeAnalysis())
-        composite.add(ConsistencyScoreStrategy())
-        composite.add(UltimateLapStrategy())
-        composite.add(TyreDegradationStrategy())
-        composite.add(GearUsageAnalysis())
-        composite.add(ThrottleAnalysis())
+        # composite.add(BrakeAnalysis())
+        # composite.add(ConsistencyScoreStrategy())
+        # composite.add(UltimateLapStrategy())
+        # composite.add(TyreDegradationStrategy())
+        # composite.add(GearUsageAnalysis())
+        # composite.add(ThrottleAnalysis())
 
         return composite
