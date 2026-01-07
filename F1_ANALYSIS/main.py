@@ -7,8 +7,8 @@ from F1_ANALYSIS.data.F1DataFacade import F1DataFacade
 
 def print_menu():
     print("\n=== F1 TELEMETRY ANALYZER ===")
-    print("1. Pokaż dostępne wyścigi (2023)")
-    print("2. Generuj raport: Ranking Kwalifikacji (Najszybsze okrążenie)")
+    print("1. Pokaż dostępne wyścigi (2024)")
+    print("2. Generuj raport: Ranking Kwalifikacji (Najszybsze okrążenie) TODO!!")#TODO
     print("3. Generuj raport: Porównanie Telemetrii (H2H - Wykresy)")
     print("0. Wyjście")
     print("=============================")
@@ -26,7 +26,7 @@ def main():
         if choice == "1":
             # --- STARA FUNKCJONALNOŚĆ (Bezpieczna) ---
             print("\nPobieranie listy wyścigów...")
-            races = facade.get_meetings(2023)
+            races = facade.get_meetings(2024)
             for r in races:
                 print(f"[{r['meeting_key']}] {r['meeting_official_name']}")
 
