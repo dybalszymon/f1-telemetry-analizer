@@ -56,6 +56,7 @@ class F1DataFacade:
         params = {'year': year}
         return self._get("races", params);
 
+
     def get_lap_times(self):
         return self.data_source.fetch_lap_times()
 
