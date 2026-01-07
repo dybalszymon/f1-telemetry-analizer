@@ -17,8 +17,14 @@ class F1DataFacade:
             print(f"Error: blad polaczenia z API: {e}")
             return[]
 
-    def get_lap_times(self):
+    def get_session_laps_time(self, session_key: int, driver_number: int = None):
+        params = {'session_key': session_key}
 
+        if(driver_number):
+            params['driver_number'] = driver_number
+
+        return self._get("laps", params)
+    def get_lap_times(self):
         return self.data_source.fetch_lap_times()
 
 
