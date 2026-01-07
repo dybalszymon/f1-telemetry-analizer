@@ -18,12 +18,34 @@ class F1DataFacade:
             return[]
 
     def get_session_laps_time(self, session_key: int, driver_number: int = None):
+        # last parameter none -> all drivers
         params = {'session_key': session_key}
 
         if(driver_number):
             params['driver_number'] = driver_number
 
         return self._get("laps", params)
+
+    def get_car_telemetry(self, session_key: int, driver_number: int):
+        """
+        func get all data({
+        "date": "2024-03-02T15:00:00.456Z",
+        "session_key": 9158,
+        "driver_number": 1,
+        "speed": 315,
+        "rpm": 11800,
+        "gear": 7,
+        "n_gear": false,
+        "throttle": 100,
+        "brake": 0,
+        "drs": 12
+        }) from driver, in tests, check if it is too much
+        """
+        params = {'session_key': session_key,
+                  'driver_number': driver_number}
+        return self._get("telemetry", params);
+
+
     def get_lap_times(self):
         return self.data_source.fetch_lap_times()
 
