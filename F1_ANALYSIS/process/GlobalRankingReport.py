@@ -12,6 +12,6 @@ class GlobalRankingReport(RaceReportTemplate):
     def __init__(self, strategy : AnalysisStrategyInterface, data_facade: F1DataFacade, renderer: ReportRenderer):
         super().__init__(strategy, data_facade, renderer)
 
-    @override
-    def _fetch_data(self):
-        pass
+
+    def fetch_data(self):
+        self.raw_data = self.facade.get_session_laps(self.session_key)
