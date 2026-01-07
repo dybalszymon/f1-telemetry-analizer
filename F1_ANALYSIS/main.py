@@ -49,7 +49,7 @@ def main():
             s_key = int(s_key) if s_key else default_session
 
             d1 = 1
-            d2 = 16 #TODO method to chose drivers from race and assign to this variables
+            d2 = 16 #TODO methods to chose drivers from race and assign to this variables, race also
 
             if d1 and d2:
                 print(f"\nPobieranie i przetwarzanie danych (to może chwilę potrwać)...")
