@@ -45,6 +45,16 @@ class F1DataFacade:
                   'driver_number': driver_number}
         return self._get("telemetry", params);
 
+    def get_drivers(self, session_key: int):
+        return self._get("drivers", {'session_key': session_key})
+
+    def get_weather(self, session_key: int):
+        return self._get("weather", {'session_key': session_key})
+
+    def get_races(self, year: int):
+        #return list of races IDs from choosen year
+        params = {'year': year}
+        return self._get("races", params);
 
     def get_lap_times(self):
         return self.data_source.fetch_lap_times()
