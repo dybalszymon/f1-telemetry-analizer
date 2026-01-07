@@ -6,6 +6,7 @@ from F1_ANALYSIS.logic.TelemetryComposite import TelemetryComposite
 from F1_ANALYSIS.presentation.PlotRenderer import PlotRenderer
 
 class QualifyingFactory(ReportFactory):
+    #TODO np lista najlepszych czasów zawodników w kwalach
     def create_ranking_report(self, session_key: int):
         strategy = FastestLapStrategy()
         return GlobalRankingReport(session_key, strategy)
