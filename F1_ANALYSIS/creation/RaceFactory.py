@@ -16,7 +16,7 @@ from F1_ANALYSIS.creation.ReportFactory import ReportFactory
 
 
 class RaceReportFactory(ReportFactory):
-
+    #TODO np lista czasów w kwalifikacjach
     def create_ranking_report(self, renderer: ReportRenderer) -> RaceReportTemplate:
 
         strategy = ConsistencyScoreStrategy()
