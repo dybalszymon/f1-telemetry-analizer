@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
-# from logic.Strategies import TyreDegradationStrategy, ConsistencyScoreStrategy
-# from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
-#
-# from presentation.CliRenderer import CliRenderer
-# from presentation.PdfRenderer import PdfRenderer
-# from presentation.PlotRenderer import PlotRenderer
-# from presentation.ReportRenderer import ReportRenderer
-#
-# from process.GlobalRankingReport import GlobalRankingReport
-# from process.HeadToHeadReport import HeadToHeadReport
-# from data.F1DataFacade import F1DataFacade
-# from creation.ReportFactory import *
+from logic.Strategies import TyreDegradationStrategy, ConsistencyScoreStrategy
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
-from F1_ANALYSIS.creation.ReportFactory import ReportFactory
+from presentation.CliRenderer import CliRenderer
+from presentation.PdfRenderer import PdfRenderer
+from presentation.PlotRenderer import PlotRenderer
+from presentation.ReportRenderer import ReportRenderer
+
+from process.GlobalRankingReport import GlobalRankingReport
+from process.HeadToHeadReport import HeadToHeadReport
+from data.F1DataFacade import F1DataFacade
+from creation.ReportFactory import *
+
+from creation.ReportFactory import ReportFactory
 
 
 class RaceReportFactory(ReportFactory):

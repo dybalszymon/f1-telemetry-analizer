@@ -1,9 +1,9 @@
-from F1_ANALYSIS.creation.ReportFactory import ReportFactory
-from F1_ANALYSIS.process.GlobalRankingReport import GlobalRankingReport
-from F1_ANALYSIS.process.HeadToHeadReport import HeadToHeadReport
-from F1_ANALYSIS.logic.Strategies import FastestLapStrategy, TelemetryComparisonStrategy
-from F1_ANALYSIS.logic.TelemetryComposite import TelemetryComposite
-from F1_ANALYSIS.presentation.PlotRenderer import PlotRenderer
+from creation.ReportFactory import ReportFactory
+from process.GlobalRankingReport import GlobalRankingReport
+from process.HeadToHeadReport import HeadToHeadReport
+from logic.Strategies import FastestLapStrategy, TelemetryComparisonStrategy
+from logic.TelemetryComposite import TelemetryComposite
+from presentation.PlotRenderer import PlotRenderer
 
 class QualifyingFactory(ReportFactory):
     #TODO np lista najlepszych czasów zawodników w kwalach

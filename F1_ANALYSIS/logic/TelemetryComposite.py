@@ -1,4 +1,4 @@
-from F1_ANALYSIS.logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
 
 class TelemetryComposite(AnalysisStrategyInterface):

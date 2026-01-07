@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from F1_ANALYSIS.presentation.ReportRenderer import ReportRenderer
+from presentation.ReportRenderer import ReportRenderer
 
 
 class PlotRenderer(ReportRenderer):

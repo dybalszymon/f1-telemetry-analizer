@@ -2,7 +2,7 @@
 from typing import List, Any
 
 from datetime import datetime
-from F1_ANALYSIS.logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
 
 class FastestLapStrategy(AnalysisStrategyInterface):
