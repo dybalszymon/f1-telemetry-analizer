@@ -12,6 +12,9 @@ from process.HeadToHeadReport import HeadToHeadReport
 from data.F1DataFacade import F1DataFacade
 from creation.ReportFactory import *
 
+from F1_ANALYSIS.creation.ReportFactory import ReportFactory
+
+
 class RaceReportFactory(ReportFactory):
     def create_ranking_report(self, renderer: ReportRenderer) -> RaceReportTemplate:
 

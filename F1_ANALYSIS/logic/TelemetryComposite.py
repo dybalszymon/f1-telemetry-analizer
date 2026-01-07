@@ -1,21 +1,31 @@
 from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 from logic.Strategies import *
 
-class TelemetryComposite(AnalysisStrategy):
+
+class TelemetryComposite(AnalysisStrategyInterface):
     def __init__(self):
-        # Lista przechowująca dzieci (inne strategie lub inne kompozyty)
-        self.children: List[AnalysisStrategy] = []
+        self.strategies = []
 
-    def add(self, strategy: AnalysisStrategy):
-        # Tutaj będzie logika dodawania (np. self.children.append(strategy))
-        pass
+    def add(self, strategy: AnalysisStrategyInterface):
+        self.strategies.append(strategy)
 
-    def calculate(self, data: Any):
-        # Tutaj będzie pętla po self.children
-        # for child in self.children:
-        #     child.calculate(data)
-        pass
+    def calculate(self, data):
 
+        composite_result = {}
+        for strategy in self.strategies:
+            composite_result[strategy.get_name()] = strategy.calculate(data)
+        return composite_result
+
+    def get_name(self):
+        return "Złożona Telemetria Porównawcza"
+
+def create_telemetry_comparison(self, session_key, d1, d2):
+    composite = TelemetryComposite()
+    composite.add(SpeedStrategy())
+    composite.add(ThrottleStrategy())
+    composite.add(BrakeStrategy())
+
+    return HeadToHeadReport(session_key, d1, d2, composite, PlotRenderer())
 # Factory do tworzenia gotowych paczek analiz
 class StrategyFactory:
     @staticmethod

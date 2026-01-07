@@ -6,13 +6,23 @@ from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 from typing import override
 
 
-class HeadToHeadReport(RaceReportTemplate):
+from F1_ANALYSIS.process.RaceReportTemplate import RaceReportTemplate
 
-    def __init__(self, strategy : AnalysisStrategyInterface, data_facade: F1DataFacade, driver1 : str, driver2: str):
-        super().__init__(strategy, data_facade)
+class HeadToHeadReport(RaceReportTemplate):
+    def __init__(self, session_key, driver1, driver2, strategy, renderer):
+        super().__init__(session_key, strategy, renderer)
         self.driver1 = driver1
         self.driver2 = driver2
 
-    @override
-    def _fetch_data(self):
-        pass
+    def fetch_data(self):
+        
+        self.raw_data = {
+            "driver1": {
+                "name": str(self.driver1),
+                "telemetry": self.facade.get_car_telemetry(self.session_key, self.driver1)
+            },
+            "driver2": {
+                "name": str(self.driver2),
+                "telemetry": self.facade.get_car_telemetry(self.session_key, self.driver2)
+            }
+        }
