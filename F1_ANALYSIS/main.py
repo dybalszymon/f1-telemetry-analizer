@@ -1,8 +1,8 @@
 import sys
 # Importujemy Fabrykę (Creation)
-from F1_ANALYSIS.creation.QualifyingFactory import QualifyingFactory
+from creation.QualifyingFactory import QualifyingFactory
 # Importujemy Fasadę (tylko do pobrania listy wyścigów, jeśli potrzebujesz)
-from F1_ANALYSIS.data.F1DataFacade import F1DataFacade
+from data.F1DataFacade import F1DataFacade
 
 
 def print_menu():

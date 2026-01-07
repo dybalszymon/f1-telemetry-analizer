@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from F1_ANALYSIS.logic.AnalysisStrategyInterface import AnalysisStrategyInterface
-from F1_ANALYSIS.data.F1DataFacade import F1DataFacade
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+from data.F1DataFacade import F1DataFacade
 # from presentation.ReportRenderer import ReportRenderer
 # from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 # from data.F1DataFacade import F1DataFacade
 
 from abc import ABC, abstractmethod
-from F1_ANALYSIS.data.F1DataFacade import F1DataFacade
-from F1_ANALYSIS.logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+from data.F1DataFacade import F1DataFacade
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
 
 class RaceReportTemplate(ABC):

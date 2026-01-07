@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, timedelta
-from F1_ANALYSIS.process.RaceReportTemplate import RaceReportTemplate
+from process.RaceReportTemplate import RaceReportTemplate
 
 
 class HeadToHeadReport(RaceReportTemplate):
