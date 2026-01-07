@@ -26,7 +26,7 @@ class F1DataFacade:
 
         return self._get("laps", params)
 
-    def get_car_telemetry(self, session_key: int, driver_number: int):
+    def get_car_telemetry(self, session_key: int, driver_number: int, date_start: str = None, date_end: str = None):
         """
         func get all data({
         "date": "2024-03-02T15:00:00.456Z",
@@ -41,9 +41,18 @@ class F1DataFacade:
         "drs": 12
         }) from driver, in tests, check if it is too much
         """
-        params = {'session_key': session_key,
-                  'driver_number': driver_number}
-        return self._get("telemetry", params);
+        params = {
+            'session_key': session_key,
+            'driver_number': driver_number,
+        }
+
+        # Filtrowanie po czasie (składnia OpenF1: date>=WARTOŚĆ)
+        if date_start:
+            params['date>='] = date_start
+        if date_end:
+            params['date<'] = date_end
+
+        return self._get("car_data", params)
 
     def get_drivers(self, session_key: int):
         return self._get("drivers", {'session_key': session_key})

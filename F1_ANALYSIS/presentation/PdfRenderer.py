@@ -1,4 +1,4 @@
-from presentation.ReportRenderer import ReportRenderer
+#from presentation.ReportRenderer import ReportRenderer
 
 class PdfRenderer(ReportRenderer):
     def render(self, data):

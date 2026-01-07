@@ -1,63 +1,71 @@
-from enum import Enum
-from creation.RaceFactory import RaceReportFactory
-from creation.QualifyingFactory import QualifyingReportFactory
-
-from presentation.CliRenderer import CliRenderer
-from presentation.PdfRenderer import PdfRenderer
-from presentation.PlotRenderer import PlotRenderer
-
-import typer
-
-app = typer.Typer()
+import sys
+# Importujemy Fabrykę (Creation)
+from F1_ANALYSIS.creation.QualifyingFactory import QualifyingFactory
+# Importujemy Fasadę (tylko do pobrania listy wyścigów, jeśli potrzebujesz)
+from F1_ANALYSIS.data.F1DataFacade import F1DataFacade
 
 
-class ReportFormat(str, Enum):
-    CLI = "cli"
-    PDF = "pdf"
-    PLOT = "plot"
-
-def get_renderer(fmt: ReportFormat):
-    if fmt == ReportFormat.CLI:
-        return CliRenderer()
-    elif fmt == ReportFormat.PDF:
-        return PdfRenderer()
-    elif fmt == ReportFormat.PLOT:
-        return PlotRenderer()
-    else:
-        return CliRenderer()
+def print_menu():
+    print("\n=== F1 TELEMETRY ANALYZER ===")
+    print("1. Pokaż dostępne wyścigi (2023)")
+    print("2. Generuj raport: Ranking Kwalifikacji (Najszybsze okrążenie)")
+    print("3. Generuj raport: Porównanie Telemetrii (H2H - Wykresy)")
+    print("0. Wyjście")
+    print("=============================")
 
 
-@app.command()
-def race_report_comparison(
-    driver1: str, 
-    driver2: str, 
-    format: ReportFormat = typer.Option(ReportFormat.CLI, help="Format raportu: cli, pdf lub plot")
-):
-    """
-    Generuje raport porównawczy między dwoma kierowcami.
-    """
-    factory = RaceReportFactory()
-    
-    renderer = get_renderer(format)
-    
-    print(f"Generowanie raportu dla {driver1} vs {driver2} w formacie {format.value}...")
+def main():
+    # Inicjalizacja głównych komponentów
+    facade = F1DataFacade()
+    factory = QualifyingFactory()
 
-    report = factory.create_comparison_report(driver1, driver2, renderer)
-    
-    report.generate_report()
+    while True:
+        print_menu()
+        choice = input("Wybierz opcję: ")
 
-@app.command()
-def race_report_global(
-    format: ReportFormat = typer.Option(ReportFormat.CLI, help="Wybierz format")
-):
-    """
-    Generuje raport typu Race (Global Ranking).
-    """
-    factory = RaceReportFactory()
-    renderer = get_renderer(format)
-    
-    report = factory.create_ranking_report(renderer)
-    report.generate_report()
+        if choice == "1":
+            # --- STARA FUNKCJONALNOŚĆ (Bezpieczna) ---
+            print("\nPobieranie listy wyścigów...")
+            races = facade.get_meetings(2023)
+            for r in races:
+                print(f"[{r['meeting_key']}] {r['meeting_official_name']}")
+
+        elif choice == "2":
+            # --- RAPORT PROSTY (Ranking) ---
+            s_key = input("Podaj Session Key (np. 9158): ")
+            if s_key.isdigit():
+                print(f"\nGenerowanie rankingu dla sesji {s_key}...")
+                report = factory.create_ranking_report(int(s_key))
+                report.generate_report()
+
+        elif choice == "3":
+            # --- NOWY RAPORT (Telemetria Composite + PlotRenderer) ---
+            # Tutaj używamy nowej metody, którą dopisaliśmy do fabryki
+            print("\n--- Konfiguracja Porównania ---")
+            # Domyślne wartości dla testów (Bahrajn 2023, VER vs LEC)
+            default_session = 9632
+
+            s_key = input(f"Podaj Session Key [Enter dla {default_session}]: ")
+            s_key = int(s_key) if s_key else default_session
+
+            d1 = 1
+            d2 = 16 #TODO method to chose drivers from race and assign to this variables
+
+            if d1 and d2:
+                print(f"\nPobieranie i przetwarzanie danych (to może chwilę potrwać)...")
+
+                report = factory.create_telemetry_comparison(s_key, int(d1), int(d2))
+                report.generate_report()
+            else:
+                print("Błąd: Musisz podać numery obu kierowców.")
+
+        elif choice == "0":
+            print("Zamykanie aplikacji...")
+            sys.exit()
+
+        else:
+            print("Niepoprawny wybór.")
+
 
 if __name__ == "__main__":
-    app()
+    main()

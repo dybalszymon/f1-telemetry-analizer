@@ -1,24 +1,25 @@
 from abc import ABC, abstractmethod
-from logic.Strategies import TyreDegradationStrategy, ConsistencyScoreStrategy
-from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
-
-from presentation.CliRenderer import CliRenderer
-from presentation.PdfRenderer import PdfRenderer
-from presentation.PlotRenderer import PlotRenderer
-from presentation.ReportRenderer import ReportRenderer
-
-from process.GlobalRankingReport import GlobalRankingReport
-from process.HeadToHeadReport import HeadToHeadReport
-from data.F1DataFacade import F1DataFacade
-from creation.ReportFactory import *
+# from logic.Strategies import TyreDegradationStrategy, ConsistencyScoreStrategy
+# from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+#
+# from presentation.CliRenderer import CliRenderer
+# from presentation.PdfRenderer import PdfRenderer
+# from presentation.PlotRenderer import PlotRenderer
+# from presentation.ReportRenderer import ReportRenderer
+#
+# from process.GlobalRankingReport import GlobalRankingReport
+# from process.HeadToHeadReport import HeadToHeadReport
+# from data.F1DataFacade import F1DataFacade
+# from creation.ReportFactory import *
 
 from F1_ANALYSIS.creation.ReportFactory import ReportFactory
 
 
 class RaceReportFactory(ReportFactory):
+
     def create_ranking_report(self, renderer: ReportRenderer) -> RaceReportTemplate:
 
-        strategy = ConsistencyScoreStrategy()        
+        strategy = ConsistencyScoreStrategy()
         facade = F1DataFacade()
 
         return GlobalRankingReport(strategy, facade, renderer)
@@ -31,7 +32,7 @@ class RaceReportFactory(ReportFactory):
         """
         # 1. Fabryka wybiera logikę biznesową (Strategię)
         strategy = ConsistencyScoreStrategy()
-        
+
         # 2. Tworzymy fasadę
         facade = F1DataFacade()
 

@@ -1,26 +1,27 @@
-from presentation.ReportRenderer import ReportRenderer
 import matplotlib.pyplot as plt
 from F1_ANALYSIS.presentation.ReportRenderer import ReportRenderer
 
+
 class PlotRenderer(ReportRenderer):
-    def render(self, title: str, results: list):
-        """
-        Przyjmuje listę słowników danych, z których każdy to osobny wykres (subplot).
-        """
-        num_plots = len(results)
+    def render(self, title: str, report_data: list):
+        
+        num_plots = len(report_data)
         fig, axes = plt.subplots(num_plots, 1, figsize=(12, 4 * num_plots), sharex=True)
 
-        # Jeśli jest tylko jeden wykres, matplotlib nie zwraca listy, więc poprawiamy:
-        if num_plots == 1: axes = [axes]
 
-        for i, plot_data in enumerate(results):
-            for name, d_data in plot_data["drivers"].items():
-                axes[i].plot(d_data["x"], d_data["y"], label=name)
+        if num_plots == 1:
+            axes = [axes]
 
-            axes[i].set_ylabel(plot_data["ylabel"])
-            axes[i].legend(loc="upper right")
-            axes[i].grid(True)
+        for i, plot_cfg in enumerate(report_data):
+            ax = axes[i]
+            for driver_code, telemetry in plot_cfg["drivers"].items():
+                ax.plot(telemetry["x"], telemetry["y"], label=f"Kierowca {driver_code}")
+
+            ax.set_ylabel(f"{plot_cfg['label']} [{plot_cfg['unit']}]")
+            ax.legend(loc="upper right")
+            ax.grid(True, linestyle='--', alpha=0.7)
 
         axes[-1].set_xlabel("Dystans (m)")
-        plt.tight_layout()
+        plt.suptitle(title, fontsize=16)
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.show()
