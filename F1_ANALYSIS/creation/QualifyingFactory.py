@@ -1,18 +1,10 @@
 from abc import ABC, abstractmethod
 
-from ReportFactory import *
-
-class QualifyingRankingReport(RankingReport):
-    def generate(self):
-        pass
-
-class QualifyingComparisonReport(ComparisonReport):
-    def generate(self):
-        pass
+from creation.ReportFactory import *
 
 class QualifyingReportFactory(ReportFactory):
-    def create_ranking_report(self) -> RankingReport:
-        return QualifyingRankingReport()
+    def create_ranking_report(self) -> RaceReportTemplate:
+        return RaceReportTemplate()
 
-    def create_comparison_report(self) -> ComparisonReport:
-        return QualifyingComparisonReport()
+    def create_comparison_report(self) -> RaceReportTemplate:
+        return RaceReportTemplate()

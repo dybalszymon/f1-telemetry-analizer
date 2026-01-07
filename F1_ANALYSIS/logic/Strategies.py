@@ -1,38 +1,38 @@
-from AnalysisStrategyInterface import AnalysisStrategy
+from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 from typing import List, Any
 
-class BrakeAnalysis(AnalysisStrategy):
+class BrakeAnalysis(AnalysisStrategyInterface):
     def calculate(self, data: Any):
         pass
 
-class ConsistencyScoreStrategy(AnalysisStrategy):
+class ConsistencyScoreStrategy(AnalysisStrategyInterface):
     def calculate(self, data: Any):
         pass
 
-class UltimateLapStrategy(AnalysisStrategy):
+class UltimateLapStrategy(AnalysisStrategyInterface):
     def calculate(self, data: Any):
         pass
 
-class TyreDegradationStrategy(AnalysisStrategy):
+class TyreDegradationStrategy(AnalysisStrategyInterface):
     def calculate(self, data: Any):
         pass
 
-class GearUsageAnalysis(AnalysisStrategy):
+class GearUsageAnalysis(AnalysisStrategyInterface):
     def calculate(self, data: Any):
         pass
 
-class ThrottleAnalysis(AnalysisStrategy):
+class ThrottleAnalysis(AnalysisStrategyInterface):
     def calculate(self, data: Any):
         pass
 
 # --- 3. Kompozyt (Kontener na strategie) ---
 
-class TelemetryComposite(AnalysisStrategy):
+class TelemetryComposite(AnalysisStrategyInterface):
     def __init__(self):
         # Lista przechowująca dzieci (inne strategie lub inne kompozyty)
-        self.children: List[AnalysisStrategy] = []
+        self.children: List[AnalysisStrategyInterface] = []
 
-    def add(self, strategy: AnalysisStrategy):
+    def add(self, strategy: AnalysisStrategyInterface):
         # Tutaj będzie logika dodawania (np. self.children.append(strategy))
         pass
 
