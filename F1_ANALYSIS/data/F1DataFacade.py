@@ -16,10 +16,9 @@ class F1DataFacade:
         """
         url = urljoin(self.BASE_URL, endpoint)
         try:
-            # WAŻNE: params=params sprawia, że biblioteka requests sama
-            # zamienia 'date>=' na 'date%3E%3D' i dokleja do URL.
+
             response = self.session.get(url, params=params, timeout=10)
-            response.raise_for_status()  # Rzuć błędem jeśli status to 4xx lub 5xx
+            response.raise_for_status()
             return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Error: błąd HTTP: {e}")
@@ -40,9 +39,8 @@ class F1DataFacade:
         return self._get("laps", params)
 
     def get_car_telemetry(self, session_key: int, driver_number: int, date_start: str = None, date_end: str = None):
-        """
-        Pobiera telemetrię. Klucze 'date>=' i 'date<' są tutaj kluczowe.
-        """
+
+
         params = {
             'session_key': session_key,
             'driver_number': driver_number,
