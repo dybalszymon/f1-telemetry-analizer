@@ -24,4 +24,5 @@ class PlotRenderer(ReportRenderer):
         axes[-1].set_xlabel("Dystans (m)")
         plt.suptitle(title, fontsize=16)
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        plt.show()
+        import streamlit as st
+        st.pyplot(plt.gcf())
