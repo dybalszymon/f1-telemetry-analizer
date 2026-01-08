@@ -1,55 +1,61 @@
-🏎️ Instrukcja uruchomienia (WINDOWS): F1 Telemetry Analyzer
-1. Wymagania wstępne
-Python 3.12: Jeśli nie masz Pythona, pobierz go z python.org.
+===========================================================================
+                INSTRUKCJA OBSLUGI: F1 TELEMETRY ANALYZER
+===========================================================================
 
-Ważne: Podczas instalacji koniecznie zaznacz okienko "Add Python to PATH".
+1. O PROJEKCIE
+--------------
+Aplikacja sluzy do analizy danych telemetrycznych bolidow F1 (predkosc, 
+biegi, DRS, opony). Dane pobierane sa na biezasco z serwerow FastF1.
 
-Internet: Dane F1 są pobierane na bieżąco z serwerów.
+2. WYMAGANIA (WINDOWS)
+----------------------
+- Zainstalowany Python 3.11 lub nowszy.
+- Podczas instalacji Pythona MUSI byc zaznaczone: "Add Python to PATH".
+- Polaczenie z internetem (do pobierania danych o wyscigach).
 
-2. Pierwsza konfiguracja (Automatyczna)
-Przygotowalismy projekt tak, aby na Windowsie niemal wszystko działo się samo.
+3. JAK URUCHOMIC PROGRAM (NAJSZYBSZY SPOSOB)
+-------------------------------------------
+W glownym folderze projektu (f1-telemetry-analizer) znajdz plik:
+   -> run_app_windows.bat
 
-Pobierz/Rozpakuj projekt do dowolnego folderu.
+Kliknij go dwukrotnie. Skrypt sam stworzy srodowisko, zainstaluje 
+biblioteki i otworzy aplikacje w przegladarce.
 
-Znajdź w głównym folderze plik o nazwie run_app_windows.bat.
+4. URUCHAMIANIE RECZNE (POWERSHELL)
+-----------------------------------
+Jesli skrypt .bat nie zadziala, wpisz kolejno w PowerShellu:
+   1. cd "sciezka/do/folderu/projektu"
+   2. python -m venv venv_win
+   3. .\venv_win\Scripts\Activate.ps1
+   4. pip install streamlit fastf1 matplotlib pandas typing-extensions
+   5. $env:PYTHONPATH="."; python -m streamlit run F1_ANALYSIS/main.py
 
-Kliknij na niego prawym przyciskiem myszy i wybierz "Uruchom jako administrator" (tylko za pierwszym razem, aby system pozwolił na stworzenie środowiska).
+5. OBSLUGA APLIKACJI W PRZEGLADARCE
+-----------------------------------
+Po otwarciu strony (http://localhost:8501):
+   - Wybierz z menu "OPCJA 3" (Session Key).
+   - Wpisz kod sesji: 9158 (to jest GP Hiszpanii 2024).
+   - Kliknij Enter/Load i poczekaj na pobranie danych.
+   - Pierwsze ladowanie moze potrwac ok. 60 sekund.
 
-Co zrobi ten skrypt?
+6. CIEKAWE KODY SESJI DO TESTOWANIA (2024)
+------------------------------------------
+   - 9158 -> GP Hiszpanii (najbardziej stabilne dane)
+   - 9165 -> GP Austrii (walka Verstappen vs Norris)
+   - 9150 -> GP Kanady (trudne warunki pogodowe)
 
-Sprawdzi, czy masz zainstalowanego Pythona.
+7. ROZWIAZYWANIE PROBLEMOW
+--------------------------
+- Blad "Scripts are disabled": 
+  Wpisz w PowerShell: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 
-Stworzy izolowany folder venv_win (środowisko wirtualne).
+- Brak modulu "streamlit":
+  Upewnij sie, ze zainstalowales biblioteki (punkt 4, krok 4).
 
-Automatycznie zainstaluje wszystkie potrzebne biblioteki (fastf1, streamlit, pandas itp.).
+- Dlugi czas ladowania: 
+  To normalne. Dane o telemetrii sa duze. Po pierwszym pobraniu beda 
+  zapisane w pamieci podrecznej (Cache) i nastepnym razem zadzialaja szybko.
 
-Uruchomi aplikację.
-
-3. Ręczne uruchamianie (PowerShell)
-Jeśli wolisz widzieć dokładnie, co się dzieje, otwórz folder projektu w PowerShell i wpisz:
-
-PowerShell
-
-# 1. Stwórz środowisko
-python -m venv venv_win
-
-# 2. Aktywuj je
-.\venv_win\Scripts\Activate.ps1
-
-# 3. Zainstaluj biblioteki
-pip install streamlit fastf1 matplotlib pandas typing-extensions
-
-# 4. Uruchom program
-$env:PYTHONPATH="."; streamlit run F1_ANALYSIS/main.py
-4. Obsługa programu w przeglądarce
-Gdy w terminalu pojawi się napis You can now view your Streamlit app in your browser, otworzy się strona WWW.
-
-Wybierz Opcję 3.
-
-Wpisz Session Key: 9158.
-
-Ciesz się wykresami!
-Rozwiązywanie problemów na Windows:
-Błąd: "Scripts are disabled on this system": Jeśli PowerShell blokuje aktywację środowiska, wpisz tę komendę i potwierdź (Y): Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-
-Błąd: "python is not recognized": Oznacza to, że podczas instalacji Pythona nie zaznaczono opcji "Add to PATH". Musisz zainstalować Pythona ponownie lub dodać go ręcznie do zmiennych systemowych.
+===========================================================================
+      Projekt realizowany w ramach przedmiotu: Wzorce Projektowe
+===========================================================================
