@@ -1,0 +1,55 @@
+🏎️ Instrukcja uruchomienia (WINDOWS): F1 Telemetry Analyzer
+1. Wymagania wstępne
+Python 3.12: Jeśli nie masz Pythona, pobierz go z python.org.
+
+Ważne: Podczas instalacji koniecznie zaznacz okienko "Add Python to PATH".
+
+Internet: Dane F1 są pobierane na bieżąco z serwerów.
+
+2. Pierwsza konfiguracja (Automatyczna)
+Przygotowalismy projekt tak, aby na Windowsie niemal wszystko działo się samo.
+
+Pobierz/Rozpakuj projekt do dowolnego folderu.
+
+Znajdź w głównym folderze plik o nazwie run_app_windows.bat.
+
+Kliknij na niego prawym przyciskiem myszy i wybierz "Uruchom jako administrator" (tylko za pierwszym razem, aby system pozwolił na stworzenie środowiska).
+
+Co zrobi ten skrypt?
+
+Sprawdzi, czy masz zainstalowanego Pythona.
+
+Stworzy izolowany folder venv_win (środowisko wirtualne).
+
+Automatycznie zainstaluje wszystkie potrzebne biblioteki (fastf1, streamlit, pandas itp.).
+
+Uruchomi aplikację.
+
+3. Ręczne uruchamianie (PowerShell)
+Jeśli wolisz widzieć dokładnie, co się dzieje, otwórz folder projektu w PowerShell i wpisz:
+
+PowerShell
+
+# 1. Stwórz środowisko
+python -m venv venv_win
+
+# 2. Aktywuj je
+.\venv_win\Scripts\Activate.ps1
+
+# 3. Zainstaluj biblioteki
+pip install streamlit fastf1 matplotlib pandas typing-extensions
+
+# 4. Uruchom program
+$env:PYTHONPATH="."; streamlit run F1_ANALYSIS/main.py
+4. Obsługa programu w przeglądarce
+Gdy w terminalu pojawi się napis You can now view your Streamlit app in your browser, otworzy się strona WWW.
+
+Wybierz Opcję 3.
+
+Wpisz Session Key: 9158.
+
+Ciesz się wykresami!
+Rozwiązywanie problemów na Windows:
+Błąd: "Scripts are disabled on this system": Jeśli PowerShell blokuje aktywację środowiska, wpisz tę komendę i potwierdź (Y): Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
+Błąd: "python is not recognized": Oznacza to, że podczas instalacji Pythona nie zaznaczono opcji "Add to PATH". Musisz zainstalować Pythona ponownie lub dodać go ręcznie do zmiennych systemowych.

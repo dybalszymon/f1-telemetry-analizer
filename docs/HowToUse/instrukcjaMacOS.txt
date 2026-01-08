@@ -1,0 +1,48 @@
+🏎️ Instrukcja uruchomienia: F1 Telemetry Analyzer
+Aplikacja służy do analizy telemetrii i wyników F1 przy użyciu biblioteki FastF1 oraz interfejsu Streamlit.
+
+1. Wymagania wstępne
+System macOS lub Linux.
+
+Zainstalowany Python 3.12 (sprawdź: python3.12 --version).
+
+Połączenie z internetem (do pobierania danych F1).
+
+2. Pierwsza konfiguracja (tylko raz)
+Zanim uruchomisz skrypt, musisz przygotować środowisko i nadać uprawnienia:
+
+Napraw certyfikaty SSL (kluczowe na macOS): Otwórz Finder -> Aplikacje -> Python 3.12 -> uruchom Install Certificates.command.
+
+Przygotuj środowisko w terminalu (będąc w folderze projektu):
+
+Bash
+
+python3.12 -m venv venv_f1
+source venv_f1/bin/activate
+pip install streamlit fastf1 matplotlib pandas typing-extensions
+Nadaj uprawnienia do skryptu startowego:
+
+Bash
+
+chmod +x run_app.sh
+3. Szybkie uruchamianie
+Od teraz, aby włączyć aplikację, wystarczy wpisać w terminalu:
+
+Bash
+
+./run_app.sh
+4. Obsługa raportów
+Po wpisaniu komendy, w przeglądarce otworzy się interfejs pod adresem http://localhost:8501.
+
+W menu wybierz Opcję 3 (Porównanie Telemetrii).
+
+Podaj Session Key: 9158 (GP Arabii Saudyjskiej 2024).
+
+System pobierze dane (logi widoczne w terminalu) i wyświetli wykresy w przeglądarce.
+
+Rozwiązywanie problemów:
+Błąd Permission denied: Wykonaj komendę chmod +x run_app.sh.
+
+Błąd ModuleNotFoundError: Upewnij się, że w pliku run_app.sh masz linię PYTHONPATH=..
+
+Brak danych: Niektóre starsze sesje (sprzed 2018 r.) mogą nie mieć pełnej telemetrii. Używaj kluczy z lat 2023-2024.
