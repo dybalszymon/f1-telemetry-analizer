@@ -8,3 +8,5 @@ typer==0.21.0
 typing_extensions==4.15.0
 matplotlib==3.10.0
 requests==2.32.3
+logic~=0.2.3
+data~=0.4

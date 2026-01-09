@@ -32,6 +32,13 @@ class F1DataFacade:
     def get_meetings(self, year: int):
         return self._get("meetings", {'year': year})
 
+    def get_sessions(self, meeting_key: int):
+        return self._get("sessions", {'meeting_key': meeting_key})
+
+    def get_session_drivers(self, session_key: int):
+        """Pobiera listę kierowców biorących udział w danej sesji."""
+        return self._get("drivers", {'session_key': session_key})
+
     def get_session_laps(self, session_key: int, driver_number: int = None):
         params = {'session_key': session_key}
         if driver_number:

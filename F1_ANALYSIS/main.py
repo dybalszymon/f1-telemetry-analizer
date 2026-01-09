@@ -1,4 +1,6 @@
 import streamlit as st
+
+from F1_ANALYSIS.logic.SessionSelector import SessionSelector
 from creation.QualifyingFactory import QualifyingFactory
 from creation.RaceFactory import RaceReportFactory
 from data.F1DataFacade import F1DataFacade
@@ -9,6 +11,7 @@ st.set_page_config(page_title="F1 Telemetry Analyzer", layout="wide")
 facade = F1DataFacade()
 qualifying_factory = QualifyingFactory()
 race_factory = RaceReportFactory()
+selector = SessionSelector(facade)
 
 # Tytuł aplikacji
 st.title("🏎️ F1 Telemetry Analyzer")
@@ -17,7 +20,7 @@ st.title("🏎️ F1 Telemetry Analyzer")
 st.sidebar.header("Wybierz rodzaj analizy")
 analysis_type = st.sidebar.radio(
     "Typ analizy:",
-    ["Lista wyścigów", "Ranking Kwalifikacji", "Porównanie Telemetrii (H2H)"]
+    ["Lista wyścigów", "Ranking Kwalifikacji", "Porównanie Telemetrii Kwalifikacje (H2H)"]
 )
 
 # --- LISTA WYŚCIGÓW ---
@@ -72,55 +75,65 @@ elif analysis_type == "Ranking Kwalifikacji":
                     st.error(f"❌ Błąd: {str(e)}")
 
 # --- PORÓWNANIE TELEMETRII ---
-elif analysis_type == "Porównanie Telemetrii (H2H)":
-    st.header("📊 Porównanie Telemetrii - Head to Head")
-    
-    col1, col2, col3 = st.columns(3)
-    
+elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
+    st.header("📊 Porównanie Telemetrii")
+
+    # A. Wybór Roku
+    col1, col2 = st.columns(2)
     with col1:
-        session_key = st.number_input(
-            "Session Key:",
-            min_value=1,
-            value=9632,
-            help="Przykład: 9632"
-        )
-    
-    with col2:
-        driver1 = st.number_input(
-            "Kierowca 1 (numer):",
-            min_value=1,
-            max_value=99,
-            value=1,
-            help="Przykład: 1 (Max Verstappen)"
-        )
-    
-    with col3:
-        driver2 = st.number_input(
-            "Kierowca 2 (numer):",
-            min_value=1,
-            max_value=99,
-            value=16,
-            help="Przykład: 16 (Charles Leclerc)"
-        )
-    
-    st.write("")
-    
-    if st.button("📈 Generuj Porównanie", type="primary"):
-        if driver1 == driver2:
-            st.warning("⚠️ Wybierz dwóch różnych kierowców!")
+        year = st.selectbox("1. Rok", [2024, 2023])
+
+    # B. Wybór Wyścigu (Używamy Selector do pobrania czystej listy)
+    races = selector.get_filtered_races(year)
+
+    if not races:
+        st.error("Nie udało się pobrać listy wyścigów.")
+    else:
+        race_map = {r['meeting_official_name']: r['meeting_key'] for r in races}
+        with col2:
+            race_name = st.selectbox("2. Wyścig", list(race_map.keys()))
+            meeting_key = race_map[race_name]
+
+        st.info(f"Wybrano: {race_name}")
+
+        # C. Szukanie Kwalifikacji (Logic delegate to Selector)
+        with st.spinner("Szukanie sesji kwalifikacyjnej..."):
+            session_key, session_name = selector.get_qualifying_session_id(meeting_key)
+
+        if not session_key:
+            st.error("❌ Dla tego wyścigu nie znaleziono sesji 'Qualifying'.")
         else:
-            with st.spinner("Pobieranie i przetwarzanie telemetrii... To może chwilę potrwać."):
-                try:
-                    report = qualifying_factory.create_comparison_report(
-                        int(session_key),
-                        int(driver1),
-                        int(driver2)
-                    )
-                    report.generate_report()
-                    st.success("✅ Porównanie wygenerowane!")
-                except Exception as e:
-                    st.error(f"❌ Błąd: {str(e)}")
-                    st.exception(e)
+            st.success(f"✅ Znaleziono sesję: **{session_name}** (ID: `{session_key}`)")
+
+            # D. Pobieranie Kierowców (Logic delegate to Selector)
+            driver_options = selector.get_formatted_driver_list(session_key)
+
+            if not driver_options:
+                st.warning("Brak danych o kierowcach.")
+            else:
+                st.subheader("Wybór Kierowców")
+                d_col1, d_col2 = st.columns(2)
+                driver_labels = list(driver_options.keys())
+
+                with d_col1:
+                    l1 = st.selectbox("Kierowca 1", driver_labels, index=0)
+                with d_col2:
+                    l2 = st.selectbox("Kierowca 2", driver_labels, index=1 if len(driver_labels) > 1 else 0)
+
+                if st.button("📈 Generuj Wykres", type="primary"):
+                    d1_num = driver_options[l1]
+                    d2_num = driver_options[l2]
+
+                    if d1_num == d2_num:
+                        st.warning("Wybierz różnych kierowców.")
+                    else:
+                        with st.spinner("Analiza w toku..."):
+                            try:
+                                report = qualifying_factory.create_comparison_report(session_key, d1_num, d2_num)
+                                report.generate_report()
+                                st.success("Gotowe!")
+                            except Exception as e:
+                                st.error(f"Błąd: {e}")
 
 # Footer
 st.sidebar.markdown("---")
@@ -132,8 +145,6 @@ st.sidebar.info(
     2. **Ranking** - znajdź najszybsze okrążenie w sesji
     3. **H2H** - porównaj telemetrię dwóch kierowców
     
-    **Popularne Session Keys:**
-    - 9158: Bahrain 2024 Qualifying
-    - 9632: Bahrain 2023 Qualifying
+    
     """
 )
