@@ -1,6 +1,4 @@
-#from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
-from typing import List, Any
-
+from typing import Any
 from datetime import datetime
 from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
@@ -10,13 +8,11 @@ class FastestLapStrategy(AnalysisStrategyInterface):
         if not data:
             return None
 
-        # Filtrujemy dane
         valid_laps = [lap for lap in data if lap.get('lap_duration') is not None]
 
         if not valid_laps:
             return None
 
-        # Szukamy minimum
         best_lap = min(valid_laps, key=lambda x: x['lap_duration'])
 
         return {
@@ -29,7 +25,6 @@ class FastestLapStrategy(AnalysisStrategyInterface):
         return "Analiza Najszybszego Okrążenia"
 
 
-# --- STRATEGIA 2: TELEMETRIA (Wykresy) ---
 class TelemetryComparisonStrategy(AnalysisStrategyInterface):
     def __init__(self, data_type: str = "speed", label: str = "Prędkość", unit: str = "km/h"):
         self.data_type = data_type
@@ -44,7 +39,6 @@ class TelemetryComparisonStrategy(AnalysisStrategyInterface):
         }
 
         for driver_key, driver_info in raw_data.items():
-            # driver_info to np. {"name": "1", "telemetry": [...]}
             telemetry_list = driver_info['telemetry']
             driver_name = driver_info['name']
 
@@ -68,18 +62,15 @@ class TelemetryComparisonStrategy(AnalysisStrategyInterface):
         current_distance = 0
         previous_time = None
 
-        # Sortujemy po dacie
         sorted_data = sorted(telemetry_list, key=lambda x: x['date'])
 
         for point in sorted_data:
             current_time = datetime.fromisoformat(point['date'])
             speed_kmh = point['speed']
 
-            # Pobieramy wartość dla osi Y (np. speed, rpm, throttle)
             val = point.get(self.data_type, 0)
             y_val.append(val)
 
-            # Obliczanie dystansu (oś X)
             if previous_time is None:
                 x_dist.append(0)
             else:
@@ -97,43 +88,76 @@ class TelemetryComparisonStrategy(AnalysisStrategyInterface):
         return f"Analiza: {self.label}"
 
 
+# ✅ PEŁNA IMPLEMENTACJA
+class ConsistencyScoreStrategy(AnalysisStrategyInterface):
+    def calculate(self, data: list):
+        """
+        Analizuje spójność czasów okrążeń.
+        Niższe odchylenie standardowe = większa konsystencja
+        """
+        if not data:
+            return None
+            
+        valid_laps = [lap for lap in data if lap.get('lap_duration') is not None]
+        
+        if len(valid_laps) < 2:
+            return None
+        
+        times = [lap['lap_duration'] for lap in valid_laps]
+        avg_time = sum(times) / len(times)
+        variance = sum((t - avg_time) ** 2 for t in times) / len(times)
+        std_dev = variance ** 0.5
+        
+        driver = valid_laps[0].get('driver_number')
+        
+        return {
+            "driver": driver,
+            "avg_time": avg_time,
+            "std_dev": std_dev,
+            "consistency_score": 100 / (1 + std_dev),
+            "laps_count": len(valid_laps)
+        }
+    
+    def get_name(self) -> str:
+        return "Analiza Konsystencji"
+
+
+# Puste strategie do przyszłej implementacji
 class BrakeAnalysis(AnalysisStrategyInterface):
     def calculate(self, data: Any):
-        pass
+        return {"info": "Analiza hamowania - do zaimplementowania"}
+    
+    def get_name(self) -> str:
+        return "Analiza Hamowania"
 
-class ConsistencyScoreStrategy(AnalysisStrategyInterface):
-    def calculate(self, data: Any):
-        pass
 
 class UltimateLapStrategy(AnalysisStrategyInterface):
     def calculate(self, data: Any):
-        pass
+        return {"info": "Ultimate Lap - do zaimplementowania"}
+    
+    def get_name(self) -> str:
+        return "Ultimate Lap"
+
 
 class TyreDegradationStrategy(AnalysisStrategyInterface):
     def calculate(self, data: Any):
-        pass
+        return {"info": "Degradacja opon - do zaimplementowania"}
+    
+    def get_name(self) -> str:
+        return "Analiza Degradacji Opon"
+
 
 class GearUsageAnalysis(AnalysisStrategyInterface):
     def calculate(self, data: Any):
-        pass
+        return {"info": "Użycie biegów - do zaimplementowania"}
+    
+    def get_name(self) -> str:
+        return "Analiza Użycia Biegów"
+
 
 class ThrottleAnalysis(AnalysisStrategyInterface):
     def calculate(self, data: Any):
-        pass
-
-# --- 3. Kompozyt (Kontener na strategie) ---
-
-class TelemetryComposite(AnalysisStrategyInterface):
-    def __init__(self):
-        # Lista przechowująca dzieci (inne strategie lub inne kompozyty)
-        self.children: List[AnalysisStrategyInterface] = []
-
-    def add(self, strategy: AnalysisStrategyInterface):
-        # Tutaj będzie logika dodawania (np. self.children.append(strategy))
-        pass
-
-    def calculate(self, data: Any):
-        # Tutaj będzie pętla po self.children
-        # for child in self.children:
-        #     child.calculate(data)
-        pass
+        return {"info": "Analiza gazu - do zaimplementowania"}
+    
+    def get_name(self) -> str:
+        return "Analiza Gazu"
