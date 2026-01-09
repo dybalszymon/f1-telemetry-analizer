@@ -1,0 +1,61 @@
+===========================================================================
+                INSTRUKCJA OBSLUGI: F1 TELEMETRY ANALYZER
+===========================================================================
+
+1. O PROJEKCIE
+--------------
+Aplikacja sluzy do analizy danych telemetrycznych bolidow F1 (predkosc, 
+biegi, DRS, opony). Dane pobierane sa na biezasco z serwerow FastF1.
+
+2. WYMAGANIA (WINDOWS)
+----------------------
+- Zainstalowany Python 3.11 lub nowszy.
+- Podczas instalacji Pythona MUSI byc zaznaczone: "Add Python to PATH".
+- Polaczenie z internetem (do pobierania danych o wyscigach).
+
+3. JAK URUCHOMIC PROGRAM (NAJSZYBSZY SPOSOB)
+-------------------------------------------
+W glownym folderze projektu (f1-telemetry-analizer) znajdz plik:
+   -> run_app_windows.bat
+
+Kliknij go dwukrotnie. Skrypt sam stworzy srodowisko, zainstaluje 
+biblioteki i otworzy aplikacje w przegladarce.
+
+4. URUCHAMIANIE RECZNE (POWERSHELL)
+-----------------------------------
+Jesli skrypt .bat nie zadziala, wpisz kolejno w PowerShellu:
+   1. cd "sciezka/do/folderu/projektu"
+   2. python -m venv venv_win
+   3. .\venv_win\Scripts\Activate.ps1
+   4. pip install streamlit fastf1 matplotlib pandas typing-extensions
+   5. $env:PYTHONPATH="."; python -m streamlit run F1_ANALYSIS/main.py
+
+5. OBSLUGA APLIKACJI W PRZEGLADARCE
+-----------------------------------
+Po otwarciu strony (http://localhost:8501):
+   - Wybierz z menu "OPCJA 3" (Session Key).
+   - Wpisz kod sesji: 9158 (to jest GP Hiszpanii 2024).
+   - Kliknij Enter/Load i poczekaj na pobranie danych.
+   - Pierwsze ladowanie moze potrwac ok. 60 sekund.
+
+6. CIEKAWE KODY SESJI DO TESTOWANIA (2024)
+------------------------------------------
+   - 9158 -> GP Hiszpanii (najbardziej stabilne dane)
+   - 9165 -> GP Austrii (walka Verstappen vs Norris)
+   - 9150 -> GP Kanady (trudne warunki pogodowe)
+
+7. ROZWIAZYWANIE PROBLEMOW
+--------------------------
+- Blad "Scripts are disabled": 
+  Wpisz w PowerShell: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
+- Brak modulu "streamlit":
+  Upewnij sie, ze zainstalowales biblioteki (punkt 4, krok 4).
+
+- Dlugi czas ladowania: 
+  To normalne. Dane o telemetrii sa duze. Po pierwszym pobraniu beda 
+  zapisane w pamieci podrecznej (Cache) i nastepnym razem zadzialaja szybko.
+
+===========================================================================
+      Projekt realizowany w ramach przedmiotu: Wzorce Projektowe
+===========================================================================

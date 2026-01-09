@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
+import streamlit as st
 from presentation.ReportRenderer import ReportRenderer
 
-class PlotRenderer(ReportRenderer):
+class StreamlitPlotRenderer(ReportRenderer):
     def render(self, title: str, report_data: list):
         num_plots = len(report_data)
         fig, axes = plt.subplots(num_plots, 1, figsize=(12, 4 * num_plots), sharex=True)
@@ -21,10 +22,4 @@ class PlotRenderer(ReportRenderer):
         axes[-1].set_xlabel("Dystans (m)")
         plt.suptitle(title, fontsize=16)
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        
-        # Sprawdź czy działa w Streamlit czy w CLI
-        try:
-            import streamlit as st
-            st.pyplot(fig)  # ✅ Dla Streamlit
-        except (ImportError, ModuleNotFoundError):
-            plt.show()  # ✅ Dla CLI (fallback)
+        st.pyplot(fig)
