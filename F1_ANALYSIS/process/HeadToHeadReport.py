@@ -11,19 +11,15 @@ class HeadToHeadReport(RaceReportTemplate):
     def _fetch_data(self):
         """
         Pobiera SUROWE dane telemetrii dla najszybszych okrążeń obu kierowców.
-        ✅ Nie przetwarza - to robi strategia w process_data()
         """
         print(f"[PROCESS] Pobieranie telemetrii dla #{self.driver1} i #{self.driver2}...")
 
-        # Pobierz okrążenia
         laps_d1 = self.facade.get_session_laps(self.session_key, self.driver1)
         laps_d2 = self.facade.get_session_laps(self.session_key, self.driver2)
 
-        # Znajdź najlepsze okrążenie i pobierz jego telemetrię
         telemetry_d1 = self._get_best_lap_telemetry(laps_d1, self.driver1)
         telemetry_d2 = self._get_best_lap_telemetry(laps_d2, self.driver2)
 
-        # ✅ Przechowujemy SUROWE dane - strategia je przetworzy
         self.raw_data = {
             "driver1": {
                 "name": str(self.driver1),
@@ -72,7 +68,3 @@ class HeadToHeadReport(RaceReportTemplate):
 
         print(f"    [FILTERED] {len(filtered)} punktów dla kierowcy {driver_num}")
         return filtered
-
-    def display_output(self):
-        """Metoda wymagana przez klasę bazową - renderer obsługuje wyświetlanie"""
-        pass

@@ -17,18 +17,15 @@ class RaceReportTemplate(ABC):
         self.strategy = strategy
         self.renderer = renderer
         self.facade = F1DataFacade()
+        
         self.raw_data = None
         self.result = None
 
     def generate_report(self):
         self._fetch_data()
         self.process_data()
-
-
-        if self.renderer:
-            self.renderer.render(self.strategy.get_name(), self.result)
-        else:
-            self.display_output()
+    
+        self.renderer.render(self.strategy.get_name(), self.result)
 
     @abstractmethod
     def _fetch_data(self):
@@ -38,7 +35,4 @@ class RaceReportTemplate(ABC):
         if self.raw_data:
             self.result = self.strategy.calculate(self.raw_data)
 
-    @abstractmethod
-    def display_output(self):
-        pass
     

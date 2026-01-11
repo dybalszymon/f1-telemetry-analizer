@@ -15,9 +15,15 @@ st.title("🏎️ F1 Telemetry Analyzer")
 
 # Sidebar - wybór rodzaju analizy
 st.sidebar.header("Wybierz rodzaj analizy")
+# ✅ ZAKTUALIZOWANA LISTA OPCJI
 analysis_type = st.sidebar.radio(
     "Typ analizy:",
-    ["Lista wyścigów", "Ranking Kwalifikacji", "Porównanie Telemetrii (H2H)"]
+    [
+        "Lista wyścigów", 
+        "Ranking Kwalifikacji", 
+        "Porównanie Telemetrii (H2H)", 
+        "Analiza Degradacji Opon"  # <--- NOWA OPCJA
+    ]
 )
 
 # --- LISTA WYŚCIGÓW ---
@@ -122,6 +128,52 @@ elif analysis_type == "Porównanie Telemetrii (H2H)":
                     st.error(f"❌ Błąd: {str(e)}")
                     st.exception(e)
 
+# --- ANALIZA DEGRADACJI OPON (NOWY KOD) ---
+elif analysis_type == "Analiza Degradacji Opon":
+    st.header("📉 Analiza Degradacji Opon")
+    st.info("Analiza ta pokazuje, o ile sekund zwalnia kierowca na każdym okrążeniu w ramach jednego stintu (przejazdu).")
+
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        session_key_deg = st.number_input(
+            "Session Key (Wyścig):",
+            min_value=1,
+            value=9165,  # Przykładowy klucz dla wyścigu (nie kwalifikacji)
+            help="Upewnij się, że podajesz ID wyścigu (Race), a nie kwalifikacji. Np. 9165 (Bahrain 2024 Race)",
+            key="deg_session" # Unikalny klucz dla widgetu
+        )
+        
+    with col2:
+        driver_deg = st.number_input(
+            "Kierowca (numer):",
+            min_value=1,
+            max_value=99,
+            value=44,
+            help="Przykład: 44 (Lewis Hamilton)",
+            key="deg_driver"
+        )
+        
+    st.write("")
+    
+    if st.button("📉 Oblicz Degradację", type="primary"):
+        with st.spinner("Analizowanie stintów i czasów okrążeń..."):
+            try:
+                # Wywołanie odpowiedniej metody z fabryki wyścigowej
+                report = race_factory.create_tyre_degradation_report(
+                    int(session_key_deg),
+                    int(driver_deg)
+                )
+                
+                # Renderowanie wyników (zostanie obsłużone przez StreamlitRenderer)
+                report.generate_report()
+                
+                st.success("✅ Analiza degradacji zakończona!")
+            except Exception as e:
+                st.error(f"❌ Wystąpił błąd podczas analizy: {str(e)}")
+                # Opcjonalnie wyświetl pełny stack trace dla debugowania
+                # st.exception(e)
+
 # Footer
 st.sidebar.markdown("---")
 st.sidebar.info(
@@ -131,9 +183,10 @@ st.sidebar.info(
     1. **Lista wyścigów** - pobierz dostępne wyścigi i ich Session Keys
     2. **Ranking** - znajdź najszybsze okrążenie w sesji
     3. **H2H** - porównaj telemetrię dwóch kierowców
+    4. **Degradacja** - sprawdź zużycie opon w wyścigu
     
     **Popularne Session Keys:**
     - 9158: Bahrain 2024 Qualifying
-    - 9632: Bahrain 2023 Qualifying
+    - 9165: Bahrain 2024 Race
     """
 )

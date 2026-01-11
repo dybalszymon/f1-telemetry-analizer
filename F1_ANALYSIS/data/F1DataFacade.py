@@ -2,7 +2,6 @@ from urllib.parse import urljoin
 
 import requests
 
-
 class F1DataFacade:
     BASE_URL = "https://api.openf1.org/v1/"
 
@@ -65,7 +64,6 @@ class F1DataFacade:
         params = {'year': year}
         return self._get("races", params);
 
-
     def get_lap_times(self):
         return self.data_source.fetch_lap_times()
 
@@ -78,3 +76,18 @@ class F1DataFacade:
 
     def get_weather_data(self):
         pass
+
+    def get_laps_race(self, session_key: int, driver_number = -1):
+        data = self._get("sessions", {'session_key': session_key})
+
+        if not data:
+            raise ValueError(f"Session {session_key} not found.")
+            
+        session_type = data[0].get("session_name")
+        if session_type != "Race":
+            raise ValueError(f"Session {session_key} is a '{session_type}', not a 'Race'. Tire wear analysis requires a race session.")
+
+        if driver_number == -1:
+            return self._get("laps", {'session_key': session_key})
+        else:
+            return self._get("laps", {'session_key': session_key, 'driver_number': driver_number})

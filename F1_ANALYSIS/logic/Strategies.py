@@ -2,6 +2,7 @@ from typing import Any
 from datetime import datetime
 from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
+from collections import defaultdict
 
 class FastestLapStrategy(AnalysisStrategyInterface):
     def calculate(self, data: list):
@@ -88,7 +89,6 @@ class TelemetryComparisonStrategy(AnalysisStrategyInterface):
         return f"Analiza: {self.label}"
 
 
-# ✅ PEŁNA IMPLEMENTACJA
 class ConsistencyScoreStrategy(AnalysisStrategyInterface):
     def calculate(self, data: list):
         """
@@ -140,8 +140,44 @@ class UltimateLapStrategy(AnalysisStrategyInterface):
 
 
 class TyreDegradationStrategy(AnalysisStrategyInterface):
+
     def calculate(self, data: Any):
-        return {"info": "Degradacja opon - do zaimplementowania"}
+
+        # fitlrujemy dane po driver_number, nastepnie sortujemy wzgledem okrazenia
+        drivers_map = {}
+
+        for record in data:
+            driver_number = record.get("driver_number")
+            if driver_number not in drivers_map:
+                drivers_map[driver_number] = []
+            drivers_map[driver_number].append(record)
+
+        degradation_data = defaultdict(list)
+
+        for driver_number, laps in drivers_map.items():
+            laps.sort(key=lambda x: x.get("lap_number", 0))
+
+            stint = 1
+            left = 0
+            for i in range(len(laps)):
+                if laps[i]["is_pit_out_lap"] or i == len(laps) - 1:
+                    end_time = 0
+                    start_time = laps[left + 1]["lap_duration"]
+                    
+                    if i == len(laps) - 1 and not laps[i]["is_pit_out_lap"]:
+                        end_time = laps[i]["lap_duration"] 
+                    else:
+                        end_time = laps[i - 2]["lap_duration"]
+
+                    if end_time is not None and start_time is not None:        
+                        diff = end_time - start_time                
+                        degradation_data[driver_number].append({"stint": stint, "degradation": diff})
+                        
+                        stint += 1
+                    
+                    left = i
+        
+        return degradation_data
     
     def get_name(self) -> str:
         return "Analiza Degradacji Opon"
