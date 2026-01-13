@@ -26,7 +26,6 @@ class SessionSelector:
         if not sessions:
             return None, None
 
-        # LOGIKA: Szukamy sesji zawierającej "Qualifying"
         qual_session = next((s for s in sessions if "Qualifying" in s['session_name']), None)
 
         if qual_session:

@@ -26,14 +26,14 @@ analysis_type = st.sidebar.radio(
 # --- LISTA WYŚCIGÓW ---
 if analysis_type == "Lista wyścigów":
     st.header("📅 Dostępne wyścigi 2024")
-    
+
     if st.button("Pobierz listę wyścigów"):
         with st.spinner("Pobieranie danych..."):
             races = facade.get_meetings(2024)
-            
+
             if races:
                 st.success(f"Znaleziono {len(races)} wyścigów")
-                
+
                 # Wyświetl w tabeli
                 race_data = []
                 for r in races:
@@ -43,7 +43,7 @@ if analysis_type == "Lista wyścigów":
                         "Lokalizacja": r.get('location', 'N/A'),
                         "Data": r.get('date_start', 'N/A')[:10] if r.get('date_start') else 'N/A'
                     })
-                
+
                 st.dataframe(race_data, use_container_width=True)
             else:
                 st.error("Nie udało się pobrać danych")
@@ -51,9 +51,9 @@ if analysis_type == "Lista wyścigów":
 # --- RANKING KWALIFIKACJI ---
 elif analysis_type == "Ranking Kwalifikacji":
     st.header("🏁 Ranking Kwalifikacji - Najszybsze Okrążenie")
-    
+
     col1, col2 = st.columns([2, 1])
-    
+
     with col1:
         session_key = st.number_input(
             "Podaj Session Key:",
@@ -61,7 +61,7 @@ elif analysis_type == "Ranking Kwalifikacji":
             value=9158,
             help="Przykład: 9158 (Bahrajn 2024 Qualifying)"
         )
-    
+
     with col2:
         st.write("")
         st.write("")
@@ -81,7 +81,7 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
     # A. Wybór Roku
     col1, col2 = st.columns(2)
     with col1:
-        year = st.selectbox("1. Rok", [2024, 2023])
+        year = st.selectbox("1. Rok", [2025, 2024, 2023])
 
     # B. Wybór Wyścigu (Używamy Selector do pobrania czystej listy)
     races = selector.get_filtered_races(year)
@@ -101,9 +101,9 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
             session_key, session_name = selector.get_qualifying_session_id(meeting_key)
 
         if not session_key:
-            st.error("❌ Dla tego wyścigu nie znaleziono sesji 'Qualifying'.")
+            st.error("Dla tego wyścigu nie znaleziono sesji 'Qualifying'.")
         else:
-            st.success(f"✅ Znaleziono sesję: **{session_name}** (ID: `{session_key}`)")
+            st.success(f"Znaleziono sesję: **{session_name}** (ID: `{session_key}`)")
 
             # D. Pobieranie Kierowców (Logic delegate to Selector)
             driver_options = selector.get_formatted_driver_list(session_key)
