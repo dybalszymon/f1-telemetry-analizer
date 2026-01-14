@@ -10,3 +10,4 @@ matplotlib==3.10.0
 requests==2.32.3
 logic~=0.2.3
 data~=0.4
+pandas==2.3.3
