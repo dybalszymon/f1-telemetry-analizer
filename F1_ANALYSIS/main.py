@@ -65,14 +65,21 @@ elif analysis_type == "Ranking Kwalifikacji":
     with col2:
         st.write("")
         st.write("")
-        if st.button("🚀 Generuj Raport", type="primary"):
-            with st.spinner("Przetwarzanie danych..."):
-                try:
-                    report = qualifying_factory.create_ranking_report(int(session_key))
-                    report.generate_report()
-                    st.success("✅ Raport wygenerowany!")
-                except Exception as e:
-                    st.error(f"❌ Błąd: {str(e)}")
+        generate_clicked = st.button("🚀 Generuj Raport", type="primary")
+
+    if generate_clicked:
+        with st.spinner("Przetwarzanie danych..."):
+            try:
+                # 1. Tworzymy raport
+                report = qualifying_factory.create_ranking_report(int(session_key))
+
+                # 2. Generujemy go (teraz wykorzysta pełną szerokość strony)
+                report.generate_report()
+
+                st.success("✅ Raport wygenerowany!")
+
+            except Exception as e:
+                st.error(f"❌ Błąd: {str(e)}")
 
 # --- PORÓWNANIE TELEMETRII ---
 elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":

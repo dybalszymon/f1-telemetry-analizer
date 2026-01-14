@@ -39,7 +39,7 @@ class F1DataFacade:
         """Pobiera listę kierowców biorących udział w danej sesji."""
         return self._get("drivers", {'session_key': session_key})
 
-    def get_session_laps(self, session_key: int, driver_number: int = None):
+    def get_session_laps(self, session_key: int, driver_number: int = None) -> list:
         params = {'session_key': session_key}
         if driver_number:
             params['driver_number'] = driver_number

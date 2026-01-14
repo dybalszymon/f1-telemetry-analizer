@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
-from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
-from data.F1DataFacade import F1DataFacade
-# from presentation.ReportRenderer import ReportRenderer
-# from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
-# from data.F1DataFacade import F1DataFacade
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from data.F1DataFacade import F1DataFacade
+    from presentation.ReportRenderer import ReportRenderer
+    from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
 
-from abc import ABC, abstractmethod
-from data.F1DataFacade import F1DataFacade
-from logic.AnalysisStrategyInterface import AnalysisStrategyInterface
+
 
 
 class RaceReportTemplate(ABC):

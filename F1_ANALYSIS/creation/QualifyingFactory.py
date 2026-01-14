@@ -7,11 +7,15 @@ from presentation.PlotRenderer import UniversalTelemetryRenderer
 
 from data.F1DataFacade import F1DataFacade
 
+from F1_ANALYSIS.presentation.StreamlitRenderer import StreamlitRenderer
+
 
 class QualifyingFactory(ReportFactory):
     def create_ranking_report(self, session_key: int):
         strategy = FastestLapStrategy()
-        return GlobalRankingReport(session_key, strategy)
+        facade = F1DataFacade()
+        renderer = StreamlitRenderer()
+        return GlobalRankingReport(session_key, strategy, facade, renderer)
 
     def create_comparison_report(self, session_key: int, driver1: int, driver2: int):
         composite = TelemetryComposite()
