@@ -19,14 +19,14 @@ class SessionSelector:
 
     def get_qualifying_session_id(self, meeting_key: int) -> tuple[int, str]:
         """
-        Szuka klucza sesji kwalifikacyjnej dla danego weekendu.
+        Szuka klucza sesji kwalifikacyjnej dla danego weekendu (nie kwalifikacje do sprintu).
         Zwraca (session_key, session_name) lub (None, None).
         """
         sessions = self.facade.get_sessions(meeting_key)
         if not sessions:
             return None, None
 
-        qual_session = next((s for s in sessions if "Qualifying" in s['session_name']), None)
+        qual_session = next((s for s in sessions if "Qualifying" in s['session_name'] and "Sprint" not in s['session_name']), None)
 
         if qual_session:
             return qual_session['session_key'], qual_session['session_name']
