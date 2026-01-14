@@ -30,10 +30,11 @@ class StreamlitRenderer(ReportRenderer):
 
                 # Wyświetlamy jako ładną tabelę
                 st.dataframe(
-                    best_laps[['driver_number', 'team', 'lap_duration']],
+                    best_laps[['driver_number', 'driver_name', 'team', 'lap_duration']],
                     use_container_width=True,
                     column_config={
                         "driver_number": "Nr",
+                        "driver_name": "Imię kierowcy",
                         "team": "Zespół",
                         "lap_duration": st.column_config.NumberColumn("Czas [s]", format="%.3f")
                     }
@@ -43,44 +44,44 @@ class StreamlitRenderer(ReportRenderer):
                 st.dataframe(df)
 
         # --- SCENARIUSZ 2: SŁOWNIK (Twoja stara logika) ---
-        elif isinstance(data, dict):
-            # Jeśli ktoś podał tytuł w danych (opcjonalnie)
-            if 'title' in data:
-                st.subheader(data['title'])
-
-            # ✅ Obsługa FastestLapStrategy
-            if 'driver' in data and 'time' in data and 'lap_number' in data:
-                st.subheader("Najszybsze Okrążenie")
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Kierowca", f"#{data['driver']}")
-                with col2:
-                    st.metric("Czas", f"{data['time']:.3f}s")
-                with col3:
-                    st.metric("Okrążenie", data['lap_number'])
-
-            # ✅ Obsługa ConsistencyScoreStrategy
-            elif 'consistency_score' in data:
-                st.subheader("Analiza Równości Jazdy")
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric("Kierowca", f"#{data['driver']}")
-                with col2:
-                    st.metric("Średni czas", f"{data['avg_time']:.3f}s")
-                with col3:
-                    st.metric("Odchylenie", f"{data['std_dev']:.3f}s")
-                with col4:
-                    st.metric("Wynik", f"{data['consistency_score']:.1f}")
-
-                st.info(f"Przeanalizowano {data['laps_count']} okrążeń")
-
-            # ✅ Obsługa surowych danych H2H (jeśli trafią tutaj zamiast do UniversalTelemetryRenderer)
-            elif 'driver1' in data and 'driver2' in data:
-                st.write("Dane porównawcze (użyj UniversalTelemetryRenderer dla wykresów).")
-                st.json(data)
-
-            else:
-                st.json(data)
+        # elif isinstance(data, dict):
+        #     # Jeśli ktoś podał tytuł w danych (opcjonalnie)
+        #     if 'title' in data:
+        #         st.subheader(data['title'])
+        #
+        #     # ✅ Obsługa FastestLapStrategy
+        #     if 'driver' in data and 'time' in data and 'lap_number' in data:
+        #         st.subheader("Najszybsze Okrążenie")
+        #         col1, col2, col3 = st.columns(3)
+        #         with col1:
+        #             st.metric("Kierowca", f"#{data['driver']}")
+        #         with col2:
+        #             st.metric("Czas", f"{data['time']:.3f}s")
+        #         with col3:
+        #             st.metric("Okrążenie", data['lap_number'])
+        #
+        #     # ✅ Obsługa ConsistencyScoreStrategy
+        #     elif 'consistency_score' in data:
+        #         st.subheader("Analiza Równości Jazdy")
+        #         col1, col2, col3, col4 = st.columns(4)
+        #         with col1:
+        #             st.metric("Kierowca", f"#{data['driver']}")
+        #         with col2:
+        #             st.metric("Średni czas", f"{data['avg_time']:.3f}s")
+        #         with col3:
+        #             st.metric("Odchylenie", f"{data['std_dev']:.3f}s")
+        #         with col4:
+        #             st.metric("Wynik", f"{data['consistency_score']:.1f}")
+        #
+        #         st.info(f"Przeanalizowano {data['laps_count']} okrążeń")
+        #
+        #     # ✅ Obsługa surowych danych H2H (jeśli trafią tutaj zamiast do UniversalTelemetryRenderer)
+        #     elif 'driver1' in data and 'driver2' in data:
+        #         st.write("Dane porównawcze (użyj UniversalTelemetryRenderer dla wykresów).")
+        #         st.json(data)
+        #
+        #     else:
+        #         st.json(data)
 
         else:
             st.write(str(data))
