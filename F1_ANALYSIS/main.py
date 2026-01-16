@@ -1,8 +1,7 @@
 import streamlit as st
-
 from F1_ANALYSIS.logic.SessionSelector import SessionSelector
 from creation.QualifyingFactory import QualifyingFactory
-from creation.RaceFactory import RaceReportFactory
+# from creation.RaceFactory import RaceReportFactory # Jeśli używasz
 from data.F1DataFacade import F1DataFacade
 from process.PitStopReport import PitStopReport
 from presentation.StreamlitRenderer import StreamlitRenderer
@@ -11,7 +10,7 @@ st.set_page_config(page_title="F1 Telemetry Analyzer", layout="wide")
 
 facade = F1DataFacade()
 qualifying_factory = QualifyingFactory()
-race_factory = RaceReportFactory()
+# race_factory = RaceReportFactory()
 selector = SessionSelector(facade)
 streamlit_renderer = StreamlitRenderer()
 
@@ -70,11 +69,13 @@ elif analysis_type == "Ranking Kwalifikacji":
         if st.button("🚀 Generuj Raport", type="primary"):
             with st.spinner("Przetwarzanie danych..."):
                 try:
-                    report = qualifying_factory.create_ranking_report(int(session_key))
+                    # Fabryka tworzy raport
+                    report = qualifying_factory.create_ranking_report(session_key)
+                    # Uruchamiamy proces (Template Method)
                     report.generate_report()
                     st.success("✅ Raport wygenerowany!")
                 except Exception as e:
-                    st.error(f"❌ Błąd: {str(e)}")
+                    st.error(f"❌ Błąd: {e}")
 
 elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
     st.header("📊 Porównanie Telemetrii")
@@ -85,13 +86,8 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
 
     races = selector.get_filtered_races(year)
 
-    if not races:
-        st.error("Nie udało się pobrać listy wyścigów.")
-    else:
-        race_map = {r['meeting_official_name']: r['meeting_key'] for r in races}
-        with col2:
-            race_name = st.selectbox("2. Wyścig", list(race_map.keys()))
-            meeting_key = race_map[race_name]
+        # KROK 2: Pobranie listy kierowców (Selector wie jak to zrobić)
+        driver_options = selector.get_formatted_driver_list(session_key)
 
         st.info(f"Wybrano: {race_name}")
 

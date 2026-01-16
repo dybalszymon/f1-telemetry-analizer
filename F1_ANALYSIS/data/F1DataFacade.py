@@ -1,3 +1,4 @@
+#from streamlit import st
 from urllib.parse import urljoin
 
 import requests
@@ -29,9 +30,11 @@ class F1DataFacade:
             print(f"Error: błąd połączenia: {e}")
             return []
 
+    #@st.cache_data(ttl=3600)
     def get_meetings(self, year: int):
         return self._get("meetings", {'year': year})
 
+    #@st.cache_data(ttl=3600)
     def get_sessions(self, meeting_key: int):
         return self._get("sessions", {'meeting_key': meeting_key})
 
@@ -39,7 +42,7 @@ class F1DataFacade:
         """Pobiera listę kierowców biorących udział w danej sesji."""
         return self._get("drivers", {'session_key': session_key})
 
-    def get_session_laps(self, session_key: int, driver_number: int = None):
+    def get_session_laps(self, session_key: int, driver_number: int = None) -> list:
         params = {'session_key': session_key}
         if driver_number:
             params['driver_number'] = driver_number

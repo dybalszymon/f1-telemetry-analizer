@@ -26,10 +26,12 @@ class FastestLapStrategy(AnalysisStrategyInterface):
 
 
 class TelemetryComparisonStrategy(AnalysisStrategyInterface):
-    def __init__(self, data_type: str = "speed", label: str = "Prędkość", unit: str = "km/h"):
+    def __init__(self, data_type: str = "speed", label: str = "Prędkość", unit: str = "km/h", plot_style: str = "line"):
         self.data_type = data_type
         self.label = label
         self.unit = unit
+        self.plot_style = plot_style # parametr czy wykres jest ciągły czy schodkowy np biegi
+
 
     def calculate(self, raw_data: dict) -> dict:
         processed_plot = {
@@ -88,7 +90,7 @@ class TelemetryComparisonStrategy(AnalysisStrategyInterface):
         return f"Analiza: {self.label}"
 
 
-# ✅ PEŁNA IMPLEMENTACJA
+
 class ConsistencyScoreStrategy(AnalysisStrategyInterface):
     def calculate(self, data: list):
         """
