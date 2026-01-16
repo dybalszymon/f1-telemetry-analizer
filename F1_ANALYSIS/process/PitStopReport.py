@@ -2,11 +2,13 @@
 
 from process.RaceReportTemplate import RaceReportTemplate
 from logic.PitStopStrategy import PitStopStrategy
+from data.F1DataFacade import F1DataFacade
+
 
 class PitStopReport(RaceReportTemplate):
     def __init__(self, session_key: int, renderer=None):
         # Wstrzykujemy konkretną strategię
-        super().__init__(session_key, PitStopStrategy(), renderer)
+        super().__init__(session_key, PitStopStrategy(), F1DataFacade(), renderer)
 
     def _fetch_data(self):
         # Pobieramy stinty i kierowców (niezbędne do mapowania nazwisk)

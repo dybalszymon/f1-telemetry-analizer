@@ -84,49 +84,49 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
     with col1:
         year = st.selectbox("1. Rok", [2024, 2023])
 
-    races = selector.get_filtered_races(year)
+    races = selector._get_filtered_races(year)
 
         # KROK 2: Pobranie listy kierowców (Selector wie jak to zrobić)
+    driver_options = selector.get_formatted_driver_list(session_key)
+
+    st.info(f"Wybrano: {race_name}")
+
+    with st.spinner("Szukanie sesji kwalifikacyjnej..."):
+        session_key, session_name = selector.get_qualifying_session_id(meeting_key)
+
+    if not session_key:
+        st.error("❌ Dla tego wyścigu nie znaleziono sesji 'Qualifying'.")
+    else:
+        st.success(f"✅ Znaleziono sesję: **{session_name}** (ID: `{session_key}`)")
+
         driver_options = selector.get_formatted_driver_list(session_key)
 
-        st.info(f"Wybrano: {race_name}")
-
-        with st.spinner("Szukanie sesji kwalifikacyjnej..."):
-            session_key, session_name = selector.get_qualifying_session_id(meeting_key)
-
-        if not session_key:
-            st.error("❌ Dla tego wyścigu nie znaleziono sesji 'Qualifying'.")
+        if not driver_options:
+            st.warning("Brak danych o kierowcach.")
         else:
-            st.success(f"✅ Znaleziono sesję: **{session_name}** (ID: `{session_key}`)")
+            st.subheader("Wybór Kierowców")
+            d_col1, d_col2 = st.columns(2)
+            driver_labels = list(driver_options.keys())
 
-            driver_options = selector.get_formatted_driver_list(session_key)
+            with d_col1:
+                l1 = st.selectbox("Kierowca 1", driver_labels, index=0)
+            with d_col2:
+                l2 = st.selectbox("Kierowca 2", driver_labels, index=1 if len(driver_labels) > 1 else 0)
 
-            if not driver_options:
-                st.warning("Brak danych o kierowcach.")
-            else:
-                st.subheader("Wybór Kierowców")
-                d_col1, d_col2 = st.columns(2)
-                driver_labels = list(driver_options.keys())
+            if st.button("📈 Generuj Wykres", type="primary"):
+                d1_num = driver_options[l1]
+                d2_num = driver_options[l2]
 
-                with d_col1:
-                    l1 = st.selectbox("Kierowca 1", driver_labels, index=0)
-                with d_col2:
-                    l2 = st.selectbox("Kierowca 2", driver_labels, index=1 if len(driver_labels) > 1 else 0)
-
-                if st.button("📈 Generuj Wykres", type="primary"):
-                    d1_num = driver_options[l1]
-                    d2_num = driver_options[l2]
-
-                    if d1_num == d2_num:
-                        st.warning("Wybierz różnych kierowców.")
-                    else:
-                        with st.spinner("Analiza w toku..."):
-                            try:
-                                report = qualifying_factory.create_comparison_report(session_key, d1_num, d2_num)
-                                report.generate_report()
-                                st.success("Gotowe!")
-                            except Exception as e:
-                                st.error(f"Błąd: {e}")
+                if d1_num == d2_num:
+                    st.warning("Wybierz różnych kierowców.")
+                else:
+                    with st.spinner("Analiza w toku..."):
+                        try:
+                            report = qualifying_factory.create_comparison_report(session_key, d1_num, d2_num)
+                            report.generate_report()
+                            st.success("Gotowe!")
+                        except Exception as e:
+                            st.error(f"Błąd: {e}")
 
 elif analysis_type == "Strategia Pit Stopów":
     st.header("🛠️ Analiza Strategii Pit Stopów (Pirelli Style)")
@@ -135,7 +135,7 @@ elif analysis_type == "Strategia Pit Stopów":
     with col1:
         year = st.selectbox("1. Rok", [2024, 2023], key="pit_year")
 
-    races = selector.get_filtered_races(year)
+    races = selector._get_filtered_races(year)
 
     if not races:
         st.error("Błąd pobierania listy wyścigów.")

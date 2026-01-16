@@ -12,11 +12,11 @@ class StreamlitRenderer(ReportRenderer):
         
         if isinstance(data, dict):
             
-            # --- NOWA SEKCJA: WYKRES PIT STOPÓW ---
+            # --- SEKCJA 1: WYKRES PIT STOPÓW (Gantt) ---
             if 'pit_stop_chart_data' in data:
                 self._render_pit_stop_chart(data['pit_stop_chart_data'])
             
-            # ✅ Obsługa FastestLapStrategy (istniejąca)
+            # --- SEKCJA 2: FastestLapStrategy ---
             elif 'driver' in data and 'time' in data and 'lap_number' in data:
                 col1, col2, col3 = st.columns(3)
                 with col1:
@@ -26,7 +26,7 @@ class StreamlitRenderer(ReportRenderer):
                 with col3:
                     st.metric("Okrążenie", data['lap_number'])
             
-            # ✅ Obsługa ConsistencyScoreStrategy (istniejąca)
+            # --- SEKCJA 3: ConsistencyScoreStrategy ---
             elif 'consistency_score' in data:
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
@@ -39,6 +39,7 @@ class StreamlitRenderer(ReportRenderer):
                     st.metric("Wynik", f"{data['consistency_score']:.1f}")
                 st.info(f"Przeanalizowano {data['laps_count']} okrążeń")
             
+            # Fallback dla innych słowników
             else:
                 st.json(data)
                 
@@ -58,6 +59,7 @@ class StreamlitRenderer(ReportRenderer):
         fig, ax = plt.subplots(figsize=(14, 8))
         
         # Lista kierowców (oś Y)
+        # Sortujemy, aby zachować spójność (opcjonalnie można sortować po pozycji końcowej)
         y_labels = list(drivers_data.keys())
         
         # Rysowanie pasków
@@ -74,9 +76,7 @@ class StreamlitRenderer(ReportRenderer):
                 )
                 
                 # Dodajemy numer okrążenia na końcu stintu (zjazd do pitu)
-                # Pomijamy ostatni stint (koniec wyścigu)
-                # (Prosta heurystyka: jeśli stint kończy się np. > 50 okrążeniu to pewnie koniec)
-                # Lepiej: po prostu wypiszmy, tekst będzie mały
+                # Wyświetlamy tekst tylko dla czytelności (nie nachodzący na inne elementy)
                 ax.text(
                     x=stint['end'],
                     y=driver_name,
@@ -105,6 +105,14 @@ class StreamlitRenderer(ReportRenderer):
             mpatches.Patch(color='#39B54A', label='Inter'),
             mpatches.Patch(color='#00AEEF', label='Wet')
         ]
-        ax.legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5, frameon=False)
+        
+        # Legenda na dole wykresu
+        ax.legend(
+            handles=legend_patches, 
+            loc='upper center', 
+            bbox_to_anchor=(0.5, -0.1), 
+            ncol=5, 
+            frameon=False
+        )
         
         st.pyplot(fig)

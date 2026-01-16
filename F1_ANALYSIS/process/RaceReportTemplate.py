@@ -16,7 +16,8 @@ class RaceReportTemplate(ABC):
         self.facade = facade
         self.renderer = renderer
         self.raw_data = None
-
+        self.result = None
+        
     def generate_report(self):
         self._fetch_data()
         self.display_output()
