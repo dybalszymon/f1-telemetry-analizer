@@ -6,52 +6,55 @@ class PitStopStrategy(AnalysisStrategyInterface):
     def get_name(self) -> str:
         return "Analiza Strategii Pit Stopów"
 
-    def calculate(self, data: dict):
+    def calculate(self, data):
         """
-        data oczekuje słownika: {'stints': [...], 'drivers': [...]}
+        Przetwarza surowe stinty na format wykresu Gantta.
         """
-        stints_data = data.get('stints', [])
-        drivers_data = data.get('drivers', [])
+        stints = data.get('stints', [])
+        drivers = data.get('drivers', [])
 
-        if not stints_data or not drivers_data:
-            return {"error": "Brak danych o stintach lub kierowcach"}
-
-        driver_map = {d['driver_number']: d['name_acronym'] for d in drivers_data}
+        # Mapa: Numer -> Nazwisko
+        driver_map = {d['driver_number']: d['name_acronym'] for d in drivers if 'driver_number' in d}
 
         compound_colors = {
-            'SOFT': '#FF3333',
-            'MEDIUM': '#FFF200',
-            'HARD': '#FFFFFF',
-            'INTERMEDIATE': '#39B54A',
-            'WET': '#00AEEF',
-            'TEST': '#808080'
+            "SOFT": "#FF3333", "MEDIUM": "#FFFF33", "HARD": "#FFFFFF",
+            "INTERMEDIATE": "#39B54A", "WET": "#00AEEF", "TEST": "#999999"
         }
 
-        processed_drivers = {}
+        chart_data = {}
 
-        df = pd.DataFrame(stints_data)
+        for s in stints:
+            d_num = s.get('driver_number')
+            if d_num not in driver_map: continue
 
-        driver_numbers = df['driver_number'].unique()
+            # --- 🛡️ SEKCJA ZABEZPIECZEŃ (TUTAJ BYŁ BŁĄD) ---
+            start = s.get("lap_start")
+            end = s.get("lap_end")
 
-        for driver_num in driver_numbers:
-            driver_stints = df[df['driver_number'] == driver_num].sort_values('lap_start')
-            driver_acronym = driver_map.get(driver_num, f"#{driver_num}")
+            # 1. Jeśli brakuje startu lub końca (None) -> Pomiń
+            if start is None or end is None:
+                continue
 
-            stints_list = []
-            for _, stint in driver_stints.iterrows():
-                compound = str(stint['compound']).upper() if stint['compound'] else 'UNKNOWN'
+            # 2. Jeśli wartości to NaN (Not a Number) -> Pomiń
+            # Używamy pd.isna, bo to najpewniejszy sposób na wykrycie NaN
+            if pd.isna(start) or pd.isna(end):
+                continue
+            # -----------------------------------------------
 
-                stints_list.append({
-                    'start': stint['lap_start'],
-                    'end': stint['lap_end'],
-                    'length': stint['lap_end'] - stint['lap_start'],
-                    'compound': compound,
-                    'color': compound_colors.get(compound, '#808080')
-                })
+            driver_name = driver_map[d_num]
 
-            processed_drivers[driver_acronym] = stints_list
+            if driver_name not in chart_data:
+                chart_data[driver_name] = []
 
-        return {
-            'pit_stop_chart_data': processed_drivers,
-            'title': "Strategia Opon i Pit Stopów"
-        }
+            compound = s.get("compound", "UNKNOWN").upper()
+
+            # Teraz możemy bezpiecznie rzutować na int, bo wiemy, że to liczby
+            chart_data[driver_name].append({
+                "start": int(start),
+                "end": int(end),
+                "length": int(end) - int(start),
+                "color": compound_colors.get(compound, "#555555"),
+                "compound": compound
+            })
+
+        return {'pit_stop_chart_data': chart_data}
