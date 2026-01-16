@@ -6,11 +6,23 @@ from process.GlobalRankingReport import GlobalRankingReport
 from process.HeadToHeadReport import HeadToHeadReport
 from presentation.CliRenderer import CliRenderer
 
+from F1_ANALYSIS.data.F1DataFacade import F1DataFacade
+from F1_ANALYSIS.logic.PitStopStrategy import PitStopStrategy
+from F1_ANALYSIS.presentation.StreamlitRenderer import StreamlitRenderer
+from F1_ANALYSIS.process.PitStopReport import PitStopReport
+
 
 class RaceReportFactory(ReportFactory):
     def create_ranking_report(self, session_key: int):
         strategy = ConsistencyScoreStrategy()
         return GlobalRankingReport(session_key, strategy)
+
+    def create_tyre_report(self, session_key: int):
+        strategy = PitStopStrategy()
+        facade = F1DataFacade()
+        renderer = StreamlitRenderer()  # Ten sam co zawsze
+
+        return PitStopReport(session_key, strategy, facade, renderer)
 
     def create_comparison_report(self, session_key: int, driver1: int, driver2: int):
         # ✅ Używamy TelemetryComposite zamiast ConsistencyScoreStrategy

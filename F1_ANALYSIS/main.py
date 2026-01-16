@@ -1,15 +1,15 @@
 import streamlit as st
 from F1_ANALYSIS.logic.SessionSelector import SessionSelector
 from creation.QualifyingFactory import QualifyingFactory
-# from creation.RaceFactory import RaceReportFactory # Jeśli używasz
 from data.F1DataFacade import F1DataFacade
+from creation.RaceFactory import RaceReportFactory
 
 st.set_page_config(page_title="F1 Telemetry Analyzer", layout="wide")
 
 # --- INICJALIZACJA (Wstrzykiwanie Zależności) ---
 facade = F1DataFacade()
 qualifying_factory = QualifyingFactory()
-# race_factory = RaceReportFactory()
+race_factory = RaceReportFactory()
 selector = SessionSelector(facade)
 
 st.title("🏎️ F1 Telemetry Analyzer")
@@ -18,7 +18,7 @@ st.title("🏎️ F1 Telemetry Analyzer")
 st.sidebar.header("Wybierz rodzaj analizy")
 analysis_type = st.sidebar.radio(
     "Typ analizy:",
-    ["Ranking Kwalifikacji", "Porównanie Telemetrii (H2H)", "Lista wyścigów"]
+    ["Ranking Kwalifikacji", "Porównanie Telemetrii (H2H)", "Strategia Opon (Race)", "Lista wyścigów"]
 )
 
 st.sidebar.markdown("---")
@@ -113,3 +113,24 @@ elif analysis_type == "Lista wyścigów":
                 st.dataframe(races, use_container_width=True)
             else:
                 st.error("Brak danych.")
+
+elif analysis_type == "Strategia Opon (Race)":
+    st.header("🛞 Strategia Opon i Pit Stopy")
+
+    # Używamy nowej metody selectora (szuka Wyścigu, a nie Kwalifikacji)
+    session_key = selector.render_race_selector()
+
+    st.divider()
+
+    if session_key:
+        if st.button("🚀 Analizuj Strategię", type="primary"):
+            with st.spinner(f"Pobieranie danych o pit stopach dla sesji {session_key}..."):
+                try:
+                    # Zakładam, że metoda create_tyre_report jest w race_factory
+                    # (lub qualifying_factory, zależnie gdzie ją dodałeś)
+                    report = race_factory.create_tyre_report(session_key)
+
+                    report.generate_report()
+                    st.success("✅ Raport wygenerowany!")
+                except Exception as e:
+                    st.error(f"❌ Błąd: {e}")

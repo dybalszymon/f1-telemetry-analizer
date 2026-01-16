@@ -107,3 +107,42 @@ class SessionSelector:
             return qual_session['session_key'], qual_session['session_name']
 
         return None, None
+
+    def render_race_selector(self) -> int | None:
+        """
+        Rysuje wybór Rok -> Wyścig, ale automatycznie szuka sesji 'Race' (Wyścig główny).
+        """
+        st.markdown("### ⚙️ Wybór Wyścigu")
+
+        col1, col2 = st.columns(2)
+
+        # 1. ROK
+        with col1:
+            year = st.selectbox("1. Rok", [2025, 2024, 2023, 2022], index=1, key="race_year")
+
+        # 2. WYŚCIG
+        with col2:
+            races = self._get_filtered_races(year)
+            if not races:
+                st.error("Brak danych.")
+                return None
+
+            race_map = {r['meeting_official_name']: r['meeting_key'] for r in races}
+            selected_race_name = st.selectbox("2. Wyścig", list(race_map.keys()), key="race_name")
+            meeting_key = race_map[selected_race_name]
+
+        # 3. SZUKANIE SESJI 'RACE'
+        with st.spinner("Szukam sesji wyścigowej..."):
+            sessions = self.facade.get_sessions(meeting_key)
+            if not sessions:
+                return None
+
+            # Szukamy sesji, która nazywa się po prostu "Race"
+            race_session = next((s for s in sessions if s['session_name'] == "Race"), None)
+
+            if race_session:
+                st.caption(f"✅ Znaleziono: **{race_session['session_name']}** (ID: {race_session['session_key']})")
+                return race_session['session_key']
+            else:
+                st.error(f"❌ Nie znaleziono sesji wyścigowej dla {selected_race_name}.")
+                return None

@@ -1,87 +1,132 @@
 from presentation.ReportRenderer import ReportRenderer
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 class StreamlitRenderer(ReportRenderer):
     def render(self, data, strategies=None):
         """
-        Uniwersalny renderer Streamlit.
-        Obsługuje zarówno listy (Rankingi) jak i słowniki (Pojedyncze analizy).
+        Główna metoda sterująca wyświetlaniem.
         """
 
-        # --- SCENARIUSZ 1: LISTA (Ranking Kwalifikacji) ---
+        # --- 1. SCENARIUSZ: LISTA (np. Ranking Kwalifikacji) ---
         if isinstance(data, list):
             st.subheader("Wyniki Sesji")
-
             if not data:
-                st.warning("Brak danych do wyświetlenia.")
+                st.warning("Brak danych.")
                 return
 
-            # Tworzymy tabelę
             df = pd.DataFrame(data)
 
-            # Jeśli to dane z kwalifikacji (mają czas okrążenia)
+            # Tabela z wynikami okrążeń
             if 'lap_duration' in df.columns:
-                # Logika: Najlepszy czas dla każdego kierowcy
-                # Grupujemy po numerze, bierzemy indeks minimum czasu
                 idx = df.groupby('driver_number')['lap_duration'].idxmin()
                 best_laps = df.loc[idx].sort_values('lap_duration').reset_index(drop=True)
 
-                # Wyświetlamy jako ładną tabelę
                 st.dataframe(
                     best_laps[['driver_number', 'driver_name', 'team', 'lap_duration']],
                     use_container_width=True,
                     column_config={
                         "driver_number": "Nr",
-                        "driver_name": "Imię kierowcy",
+                        "driver_name": "Kierowca",
                         "team": "Zespół",
                         "lap_duration": st.column_config.NumberColumn("Czas [s]", format="%.3f")
                     }
                 )
             else:
-                # Fallback dla innych list
                 st.dataframe(df)
 
-        # --- SCENARIUSZ 2: SŁOWNIK (Twoja stara logika) ---
-        # elif isinstance(data, dict):
-        #     # Jeśli ktoś podał tytuł w danych (opcjonalnie)
-        #     if 'title' in data:
-        #         st.subheader(data['title'])
-        #
-        #     # ✅ Obsługa FastestLapStrategy
-        #     if 'driver' in data and 'time' in data and 'lap_number' in data:
-        #         st.subheader("Najszybsze Okrążenie")
-        #         col1, col2, col3 = st.columns(3)
-        #         with col1:
-        #             st.metric("Kierowca", f"#{data['driver']}")
-        #         with col2:
-        #             st.metric("Czas", f"{data['time']:.3f}s")
-        #         with col3:
-        #             st.metric("Okrążenie", data['lap_number'])
-        #
-        #     # ✅ Obsługa ConsistencyScoreStrategy
-        #     elif 'consistency_score' in data:
-        #         st.subheader("Analiza Równości Jazdy")
-        #         col1, col2, col3, col4 = st.columns(4)
-        #         with col1:
-        #             st.metric("Kierowca", f"#{data['driver']}")
-        #         with col2:
-        #             st.metric("Średni czas", f"{data['avg_time']:.3f}s")
-        #         with col3:
-        #             st.metric("Odchylenie", f"{data['std_dev']:.3f}s")
-        #         with col4:
-        #             st.metric("Wynik", f"{data['consistency_score']:.1f}")
-        #
-        #         st.info(f"Przeanalizowano {data['laps_count']} okrążeń")
-        #
-        #     # ✅ Obsługa surowych danych H2H (jeśli trafią tutaj zamiast do UniversalTelemetryRenderer)
-        #     elif 'driver1' in data and 'driver2' in data:
-        #         st.write("Dane porównawcze (użyj UniversalTelemetryRenderer dla wykresów).")
-        #         st.json(data)
-        #
-        #     else:
-        #         st.json(data)
+        # --- 2. SCENARIUSZ: SŁOWNIK (Wykresy, Analizy) ---
+        elif isinstance(data, dict):
 
+            # ✅ PRIORYTET 1: Wykres Strategii (Pit Stopy)
+            # Sprawdzamy to NAJPIERW, zanim sprawdzimy 'title'
+            if 'pit_stop_chart_data' in data:
+                if 'title' in data:
+                    st.subheader(data['title'])
+
+                # Tu wywołujemy rysowanie wykresu
+                self._render_pit_stop_chart(data['pit_stop_chart_data'])
+                return  # <--- WAŻNE: Kończymy, żeby nie wypisać JSONa na dole
+
+            # ✅ PRIORYTET 2: Najszybsze Okrążenie (Fastest Lap)
+            if 'driver' in data and 'time' in data and 'lap_number' in data:
+                if 'title' in data: st.subheader(data['title'])
+
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Kierowca", f"#{data['driver']}")
+                c2.metric("Czas", f"{data['time']:.3f}s")
+                c3.metric("Okrążenie", data['lap_number'])
+                return
+
+            # ✅ PRIORYTET 3: Inne dane z tytułem (Fallback)
+            if 'title' in data:
+                st.subheader(data['title'])
+                st.write("Podgląd surowych danych:")
+                st.json(data)
+                return
+
+            # Fallback ostateczny
+            st.json(data)
+
+        # --- 3. INNE ---
         else:
             st.write(str(data))
+
+    def _render_pit_stop_chart(self, drivers_data):
+        """Rysuje wykres Gantta w Matplotlib"""
+        if not drivers_data:
+            st.warning("Brak danych do wykresu.")
+            return
+
+        st.write("Generowanie wykresu strategii...")  # Debug info
+
+        # Styl
+        plt.style.use('dark_background')
+        fig, ax = plt.subplots(figsize=(14, len(drivers_data) * 0.5 + 2))
+
+        y_labels = list(drivers_data.keys())
+
+        # Rysowanie pasków
+        for driver_name, stints in drivers_data.items():
+            for stint in stints:
+                ax.barh(
+                    y=driver_name,
+                    width=stint['length'],
+                    left=stint['start'],
+                    color=stint['color'],
+                    edgecolor='black',
+                    height=0.6
+                )
+
+                # Numer okrążenia przy zjeździe
+                ax.text(
+                    x=stint['end'],
+                    y=driver_name,
+                    s=f"{int(stint['end'])}",
+                    color='white',
+                    va='center', ha='left', fontsize=7
+                )
+
+        ax.set_xlabel("Okrążenie")
+        ax.invert_yaxis()
+
+        # Usuwamy ramki
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+
+        # Legenda
+        legend_patches = [
+            mpatches.Patch(color='#FF3333', label='Soft'),
+            mpatches.Patch(color='#FFFF33', label='Medium'),  # Poprawiony hex żółtego
+            mpatches.Patch(color='#FFFFFF', label='Hard'),
+            mpatches.Patch(color='#39B54A', label='Inter'),
+            mpatches.Patch(color='#00AEEF', label='Wet')
+        ]
+        ax.legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5, frameon=False)
+
+        # Renderowanie w Streamlit
+        st.pyplot(fig)

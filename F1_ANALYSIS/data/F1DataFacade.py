@@ -70,6 +70,9 @@ class F1DataFacade:
     def get_weather(self, session_key: int):
         return self._get("weather", {'session_key': session_key})
 
+    def get_stints(self, session_key: int):
+        return self._get("stints", {'session_key': session_key})
+
     def get_races(self, year: int):
         #return list of races IDs from choosen year
         params = {'year': year}
