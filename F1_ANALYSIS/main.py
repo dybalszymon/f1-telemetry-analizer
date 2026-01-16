@@ -12,7 +12,7 @@ qualifying_factory = QualifyingFactory()
 race_factory = RaceReportFactory()
 selector = SessionSelector(facade)
 
-st.title("🏎️ F1 Telemetry Analyzer")
+st.title("🏎 F1 Telemetry Analyzer")
 
 # --- SIDEBAR (Nawigacja) ---
 st.sidebar.header("Wybierz rodzaj analizy")
@@ -28,7 +28,7 @@ st.sidebar.info("Aplikacja automatycznie wybiera sesję kwalifikacyjną dla wska
 # 1. RANKING KWALIFIKACJI
 # ==========================================
 if analysis_type == "Ranking Kwalifikacji":
-    st.header("🏁 Ranking Kwalifikacji")
+    st.header(" Ranking Kwalifikacji")
 
     # KROK 1: Wybór sesji (Logika delegowana do Selectora)
     # Selector sam rysuje widgety i zwraca ID znalezionej sesji
@@ -38,22 +38,22 @@ if analysis_type == "Ranking Kwalifikacji":
 
     # KROK 2: Generowanie Raportu
     if session_key:
-        if st.button("🚀 Generuj Ranking", type="primary"):
+        if st.button(" Generuj Ranking", type="primary"):
             with st.spinner(f"Pobieranie danych dla sesji {session_key}..."):
                 try:
                     # Fabryka tworzy raport
                     report = qualifying_factory.create_ranking_report(session_key)
                     # Uruchamiamy proces (Template Method)
                     report.generate_report()
-                    st.success("✅ Raport wygenerowany!")
+                    st.success(" Raport wygenerowany!")
                 except Exception as e:
-                    st.error(f"❌ Błąd: {e}")
+                    st.error(f" Błąd: {e}")
 
 # ==========================================
 # 2. PORÓWNANIE TELEMETRII (H2H)
 # ==========================================
 elif analysis_type == "Porównanie Telemetrii (H2H)":
-    st.header("📊 Porównanie Kierowców (H2H)")
+    st.header(" Porównanie Kierowców (H2H)")
 
     # KROK 1: Wybór sesji (Ten sam komponent co wyżej - DRY!)
     session_key = selector.render_selector()
@@ -93,15 +93,15 @@ elif analysis_type == "Porównanie Telemetrii (H2H)":
                             # Fabryka składa skomplikowany raport H2H
                             report = qualifying_factory.create_comparison_report(session_key, d1_num, d2_num)
                             report.generate_report()
-                            st.success("✅ Analiza zakończona!")
+                            st.success(" Analiza zakończona!")
                         except Exception as e:
-                            st.error(f"❌ Błąd: {e}")
+                            st.error(f" Błąd: {e}")
 
 # ==========================================
 # 3. LISTA WYŚCIGÓW (DEBUG / INFO)
 # ==========================================
 elif analysis_type == "Lista wyścigów":
-    st.header("📅 Baza danych wyścigów")
+    st.header(" Baza danych wyścigów")
 
     # Prosty widok tabelaryczny
     year = st.selectbox("Wybierz rok", [2025, 2024, 2023])
@@ -115,7 +115,7 @@ elif analysis_type == "Lista wyścigów":
                 st.error("Brak danych.")
 
 elif analysis_type == "Strategia Opon (Race)":
-    st.header("🛞 Strategia Opon i Pit Stopy")
+    st.header(" Strategia Opon i Pit Stopy")
 
     # Używamy nowej metody selectora (szuka Wyścigu, a nie Kwalifikacji)
     session_key = selector.render_race_selector()
@@ -123,7 +123,7 @@ elif analysis_type == "Strategia Opon (Race)":
     st.divider()
 
     if session_key:
-        if st.button("🚀 Analizuj Strategię", type="primary"):
+        if st.button(" Analizuj Strategię", type="primary"):
             with st.spinner(f"Pobieranie danych o pit stopach dla sesji {session_key}..."):
                 try:
                     # Zakładam, że metoda create_tyre_report jest w race_factory
@@ -131,6 +131,6 @@ elif analysis_type == "Strategia Opon (Race)":
                     report = race_factory.create_tyre_report(session_key)
 
                     report.generate_report()
-                    st.success("✅ Raport wygenerowany!")
+                    st.success(" Raport wygenerowany!")
                 except Exception as e:
-                    st.error(f"❌ Błąd: {e}")
+                    st.error(f" Błąd: {e}")
