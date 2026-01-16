@@ -12,7 +12,7 @@ qualifying_factory = QualifyingFactory()
 race_factory = RaceReportFactory()
 selector = SessionSelector(facade)
 
-st.title("🏎 F1 Telemetry Analyzer")
+st.title(" F1 Telemetry Analyzer")
 
 # --- SIDEBAR (Nawigacja) ---
 st.sidebar.header("Wybierz rodzaj analizy")
@@ -81,12 +81,12 @@ elif analysis_type == "Porównanie Telemetrii (H2H)":
             st.divider()
 
             # KROK 3: Generowanie Raportu
-            if st.button("📈 Porównaj Telemetrię", type="primary"):
+            if st.button(" Porównaj Telemetrię", type="primary"):
                 d1_num = driver_options[l1]
                 d2_num = driver_options[l2]
 
                 if d1_num == d2_num:
-                    st.warning("⚠️ Wybierz dwóch różnych kierowców.")
+                    st.warning(" Wybierz dwóch różnych kierowców.")
                 else:
                     with st.spinner("Pobieranie i przetwarzanie telemetrii..."):
                         try:
