@@ -4,26 +4,30 @@ from F1_ANALYSIS.logic.SessionSelector import SessionSelector
 from creation.QualifyingFactory import QualifyingFactory
 from creation.RaceFactory import RaceReportFactory
 from data.F1DataFacade import F1DataFacade
+from process.PitStopReport import PitStopReport
+from presentation.StreamlitRenderer import StreamlitRenderer
 
 st.set_page_config(page_title="F1 Telemetry Analyzer", layout="wide")
 
-# Inicjalizacja
 facade = F1DataFacade()
 qualifying_factory = QualifyingFactory()
 race_factory = RaceReportFactory()
 selector = SessionSelector(facade)
+streamlit_renderer = StreamlitRenderer()
 
-# Tytuł aplikacji
 st.title("🏎️ F1 Telemetry Analyzer")
 
-# Sidebar - wybór rodzaju analizy
 st.sidebar.header("Wybierz rodzaj analizy")
 analysis_type = st.sidebar.radio(
     "Typ analizy:",
-    ["Lista wyścigów", "Ranking Kwalifikacji", "Porównanie Telemetrii Kwalifikacje (H2H)"]
+    [
+        "Lista wyścigów", 
+        "Ranking Kwalifikacji", 
+        "Porównanie Telemetrii Kwalifikacje (H2H)",
+        "Strategia Pit Stopów"
+    ]
 )
 
-# --- LISTA WYŚCIGÓW ---
 if analysis_type == "Lista wyścigów":
     st.header("📅 Dostępne wyścigi 2024")
     
@@ -34,7 +38,6 @@ if analysis_type == "Lista wyścigów":
             if races:
                 st.success(f"Znaleziono {len(races)} wyścigów")
                 
-                # Wyświetl w tabeli
                 race_data = []
                 for r in races:
                     race_data.append({
@@ -48,7 +51,6 @@ if analysis_type == "Lista wyścigów":
             else:
                 st.error("Nie udało się pobrać danych")
 
-# --- RANKING KWALIFIKACJI ---
 elif analysis_type == "Ranking Kwalifikacji":
     st.header("🏁 Ranking Kwalifikacji - Najszybsze Okrążenie")
     
@@ -74,16 +76,13 @@ elif analysis_type == "Ranking Kwalifikacji":
                 except Exception as e:
                     st.error(f"❌ Błąd: {str(e)}")
 
-# --- PORÓWNANIE TELEMETRII ---
 elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
     st.header("📊 Porównanie Telemetrii")
 
-    # A. Wybór Roku
     col1, col2 = st.columns(2)
     with col1:
         year = st.selectbox("1. Rok", [2024, 2023])
 
-    # B. Wybór Wyścigu (Używamy Selector do pobrania czystej listy)
     races = selector.get_filtered_races(year)
 
     if not races:
@@ -96,7 +95,6 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
 
         st.info(f"Wybrano: {race_name}")
 
-        # C. Szukanie Kwalifikacji (Logic delegate to Selector)
         with st.spinner("Szukanie sesji kwalifikacyjnej..."):
             session_key, session_name = selector.get_qualifying_session_id(meeting_key)
 
@@ -105,7 +103,6 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
         else:
             st.success(f"✅ Znaleziono sesję: **{session_name}** (ID: `{session_key}`)")
 
-            # D. Pobieranie Kierowców (Logic delegate to Selector)
             driver_options = selector.get_formatted_driver_list(session_key)
 
             if not driver_options:
@@ -135,16 +132,50 @@ elif analysis_type == "Porównanie Telemetrii Kwalifikacje (H2H)":
                             except Exception as e:
                                 st.error(f"Błąd: {e}")
 
-# Footer
+elif analysis_type == "Strategia Pit Stopów":
+    st.header("🛠️ Analiza Strategii Pit Stopów (Pirelli Style)")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        year = st.selectbox("1. Rok", [2024, 2023], key="pit_year")
+
+    races = selector.get_filtered_races(year)
+
+    if not races:
+        st.error("Błąd pobierania listy wyścigów.")
+    else:
+        race_map = {r['meeting_official_name']: r['meeting_key'] for r in races}
+        with col2:
+            race_name = st.selectbox("2. Wyścig", list(race_map.keys()), key="pit_race")
+            meeting_key = race_map[race_name]
+            
+        if st.button("🔍 Znajdź sesję wyścigową i generuj"):
+            with st.spinner("Szukanie sesji wyścigowej..."):
+                sessions = facade.get_sessions(meeting_key)
+                race_session = next((s for s in sessions if "Race" in s['session_name']), None)
+                
+            if race_session:
+                session_key = race_session['session_key']
+                st.success(f"Znaleziono sesję: {race_session['session_name']} (ID: {session_key})")
+                
+                with st.spinner("Pobieranie danych o oponach i generowanie wykresu..."):
+                    try:
+                        report = PitStopReport(session_key, renderer=streamlit_renderer)
+                        report.generate_report()
+                    except Exception as e:
+                        st.error(f"Wystąpił błąd podczas generowania raportu: {e}")
+                        st.exception(e)
+            else:
+                st.error("Nie znaleziono sesji wyścigowej dla tego wydarzenia.")
+
 st.sidebar.markdown("---")
 st.sidebar.info(
     """
     **Jak używać:**
     
-    1. **Lista wyścigów** - pobierz dostępne wyścigi i ich Session Keys
-    2. **Ranking** - znajdź najszybsze okrążenie w sesji
-    3. **H2H** - porównaj telemetrię dwóch kierowców
-    
-    
+    1. **Lista wyścigów** - pobierz dostępne wyścigi
+    2. **Ranking** - analiza najszybszych okrążeń
+    3. **H2H** - porównanie kierowców
+    4. **Pit Stopy** - wizualizacja strategii opon
     """
 )
