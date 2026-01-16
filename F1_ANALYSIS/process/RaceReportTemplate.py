@@ -4,7 +4,7 @@ class RaceReportTemplate(ABC):
     def __init__(self, session_key: int, strategy, facade, renderer=None):
         self.session_key = session_key
         self.strategy = strategy
-        self.facade = facade  # ✅ To jest kluczowe! Musimy to zapisać
+        self.facade = facade
         self.renderer = renderer
         self.raw_data = None
         self.result = None
