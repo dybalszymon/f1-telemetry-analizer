@@ -88,3 +88,6 @@ class F1DataFacade:
 
     def get_weather_data(self):
         pass
+
+    def get_stints(self, session_key: int):
+        return self._get("stints", {'session_key': session_key})
