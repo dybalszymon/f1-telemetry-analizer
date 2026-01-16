@@ -118,7 +118,7 @@ class SessionSelector:
 
         # 1. ROK
         with col1:
-            year = st.selectbox("1. Rok", [2025, 2024, 2023, 2022], index=1, key="race_year")
+            year = st.selectbox("1. Rok", [2025, 2024, 2023], index=1, key="race_year")
 
         # 2. WYŚCIG
         with col2:
